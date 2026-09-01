@@ -1,0 +1,55 @@
+## Visual Studio / .NET Core
+## Ignore build outputs
+[Bb]in/
+[Oo]bj/
+out/
+artifacts/
+
+## Visual Studio user-specific files
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/
+
+## Rider
+.idea/
+
+## NuGet
+*.nupkg
+packages/
+
+## ASP.NET Core / Dotnet
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.db
+
+## Publish outputs
+publish/
+*.publishsettings
+
+## User secrets and local config
+secrets.json
+appsettings.Development.json
+
+## OS-specific
+.DS_Store
+Thumbs.db
+
+## Logs
+*.log
+
+## Node/npm
+node_modules/
+npm-debug.log*
+
+## IIS Express
+.vs/IISExpress/*
+
+## Others
+*.rpt
+*.cache
