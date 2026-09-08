@@ -1,5 +1,5 @@
 ﻿@page
-@model IndexModel
+@model Movie_Library.Pages.Library.IndexModel
 
 @{
     ViewData["Title"] = "Ma bibliothèque";
@@ -7,14 +7,60 @@
 
 <div class="container py-4">
 
-    <h1>Ma bibliothèque</h1>
+    <div class="library-header">
+        <h1>Ma bibliothèque</h1>
 
-    <p class="text-muted">
-        Retrouvez tous les films que vous avez enregistrés.
-    </p>
-
-    <div class="alert alert-info">
-        Votre bibliothèque est actuellement vide.
+        <p class="text-muted">
+            Retrouvez tous les films que vous avez enregistrés.
+        </p>
     </div>
+
+    @if (Model.Library.Movies.Count == 0)
+    {
+        <div class="library-empty">
+
+            <h2 class="h4">
+                Votre bibliothèque est vide
+            </h2>
+
+            <p class="text-muted">
+                Ajoutez des films depuis la recherche pour les retrouver ici.
+            </p>
+
+            <a asp-page="/Movies/Index" class="btn btn-primary">
+                Rechercher des films
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var movie in Model.Library.Movies)
+            {
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+
+                    <div class="card movie-card shadow-sm">
+
+                        <div class="card-body">
+
+                            <h2 class="card-title h5">
+                                @movie.Title
+                            </h2>
+
+                            <p class="card-text text-muted">
+                                @movie.Overview
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
 
 </div>
