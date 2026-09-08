@@ -27,6 +27,11 @@ namespace Movie_Library.Classes
         /// </summary>
         private List<Movie> _movies;
 
+        /// <summary>
+        /// Liste des collections personnelles dans la bibliothèque.
+        /// </summary>
+        private List<Collection> _collections;
+
 
         /// <summary>
         /// HttpClient permet d'envoyer des requêtes HTTP.
@@ -57,9 +62,10 @@ namespace Movie_Library.Classes
 
             /*
              * Au moment de créer une bibliothèque,
-             * sa liste de films est vide.
+             * sa liste de films et de collections est vide.
              */
             _movies = new List<Movie>();
+            _collections = new List<Collection>();
 
 
             /*
@@ -82,6 +88,26 @@ namespace Movie_Library.Classes
                 ?? throw new InvalidOperationException(
                     "La variable TMDB_API_TOKEN est introuvable dans le fichier .env."
                 );
+        }
+
+
+        /// <summary>
+        /// Retourne tous les films présents dans la bibliothèque.
+        /// </summary>
+        /// <returns>La liste des films.</returns>
+        public List<Movie> Movies
+        {
+            get { return _movies; }
+        }
+
+
+        /// <summary>
+        /// Retourne toutes les collections présentes dans la bibliothèque.
+        /// </summary>
+        /// <returns>La liste des collections.</returns>
+        public List<Collection> Collections
+        {
+            get { return _collections; }
         }
 
 
@@ -373,6 +399,37 @@ namespace Movie_Library.Classes
             return _movies
                 .OrderBy(movie => movie.Title)
                 .ToList();
+        }
+
+
+        /// <summary>
+        /// Ajoute une collection à la bibliothèque.
+        /// </summary>
+        /// <param name="collection">Collection à ajouter.</param>
+        public void addCollection(Collection collection)
+        {
+            /*
+             * Vérifie que la collection n'est pas déjà
+             * présente dans la liste avant de l'ajouter.
+             */
+            if (!_collections.Contains(collection))
+            {
+                _collections.Add(collection);
+            }
+            else
+            {
+                Console.WriteLine("La collection est déjà présente dans la bibliothèque.");
+            }
+        }
+
+
+        /// <summary>
+        /// Supprime une collection de la bibliothèque.
+        /// </summary>
+        /// <param name="collection">Collection à supprimer.</param>
+        public void removeCollection(Collection collection)
+        {
+            _collections.Remove(collection);
         }
     }
 }
