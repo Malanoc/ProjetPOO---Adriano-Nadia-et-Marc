@@ -65,7 +65,7 @@ namespace Movie_Library.Classes
             _title = title;
             _synopsis = synopsis;
             _poster = poster;
-            _ratingTMDB = ratingTMDB;
+            _ratingTMDB = ratingTMBD;
             _status = status;
 
             // Initialisation des données personnelles par défaut.
@@ -78,17 +78,24 @@ namespace Movie_Library.Classes
         /// Lecture seule du titre du film.
         /// </summary>
         /// <returns></returns>
-        public string Title()
+        public string Title
         {
            get { return _title; }
         }
 
-       
+        /// <summary>
+        /// Lecture seule de l'identifiant du film.
+        /// </summary>
+        public int Id
+        {
+            get { return _id; }
+        }
+
         /// <summary>
         /// Lecture seule du synposis du film.
         /// </summary>
         /// <returns></returns>
-        public string Synopsis()
+        public string Synopsis
         {
             get{ return _synopsis; }
         }
@@ -97,7 +104,7 @@ namespace Movie_Library.Classes
        /// Lecture seule du poster du film.
        /// </summary>
        /// <returns></returns>
-        public string Poster()
+        public string Poster
         {
            get { return _poster; }
         }
@@ -107,7 +114,7 @@ namespace Movie_Library.Classes
         /// </summary>
         /// <returns></returns>
         
-        public float RatingTMDB()
+        public float RatingTMDB
 
         {
            get{ return _ratingTMDB; }
@@ -118,7 +125,7 @@ namespace Movie_Library.Classes
         /// Lecture et modification du score personnel de l'utilisateur.
         /// </summary>
         /// <returns></returns>
-        public float PersonalRating()
+        public float PersonalRating
 
         {
             get { return _personalRating; }
@@ -129,7 +136,7 @@ namespace Movie_Library.Classes
        /// Lecture et modification de la note personnel de l'utilisateur. 
        /// </summary>
        /// <returns></returns>
-        public string PersonalNote()
+        public string PersonalNote
 
          {
             get { return _personalNote; }
@@ -143,20 +150,20 @@ namespace Movie_Library.Classes
         /// Lecture et modification du statut de visionnage.
         /// </summary>
         /// <returns></returns>
-        public Status Status()
+        public Status Status
 
         { 
            get { return _status; }
            set 
             {
-                if (_status != status)
+                if (_status != value)
                 {
-                    _status = status;
-                    Console.WriteLine($"Le statut a été modifié : {status}.");
+                    _status = value;
+                    Console.WriteLine($"Le statut a été modifié : {value}.");
                 }
                 else
                 {
-                    Console.WriteLine($"Le film est déjà au statut : {status}.");
+                    Console.WriteLine($"Le film est déjà au statut : {value}.");
                 }
 
             }

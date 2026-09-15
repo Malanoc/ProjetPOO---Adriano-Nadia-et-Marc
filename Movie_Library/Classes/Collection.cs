@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace Movie_Library.Classes
 {
@@ -77,16 +78,23 @@ namespace Movie_Library.Classes
         public void addMovie(Movie movie)
         {
             /*
-             * On vérifie que le film n'est pas déjà présent
-             * pour éviter les doublons dans la collection.
+             * Vérifie si le film est déjà présent dans
+             * cette collection grâce à son identifiant TMDB.
              */
-            if (!_movies.Contains(movie))
+            bool movieAlreadyExists =
+                _movies.Any(existingMovie =>
+                    existingMovie.Id == movie.Id
+                );
+
+            if (!movieAlreadyExists)
             {
                 _movies.Add(movie);
             }
             else
-            { 
-                Console.WriteLine($"Le film '{movie.Title}' est déjà présent dans la collection.");
+            {
+                Console.WriteLine(
+                    $"Le film '{movie.Title}' est déjà présent dans la collection."
+                );
             }
         }
 
