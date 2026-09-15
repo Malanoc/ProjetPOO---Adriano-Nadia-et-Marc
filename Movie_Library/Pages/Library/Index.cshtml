@@ -15,6 +15,39 @@
         </p>
     </div>
 
+    <div class="library-toolbar mb-4">
+
+        <div class="row g-3 align-items-end">
+
+            <div class="col-12 col-md-6">
+                <label for="sort" class="form-label">
+                    Trier par
+                </label>
+
+                <select id="sort" class="form-select">
+                    <option value="title">Titre</option>
+                    <option value="rating">Note</option>
+                    <option value="status">Statut</option>
+                </select>
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label for="status" class="form-label">
+                    Filtrer par statut
+                </label>
+
+                <select id="status" class="form-select">
+                    <option value="all">Tous les films</option>
+                    <option value="notseen">Non vus</option>
+                    <option value="inprogress">En cours</option>
+                    <option value="seen">Vus</option>
+                </select>
+            </div>
+
+        </div>
+
+    </div>
+
     @if (Model.Library.Movies.Count == 0)
     {
         <div class="library-empty">
@@ -35,22 +68,24 @@
     }
     else
     {
-        <div class="row g-4">
+        <div id="movie-grid" class="row g-4">
 
             @foreach (var movie in Model.Library.Movies)
             {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 movie-item"
+                     data-title="@movie.GetTitle()"
+                     data-status="@movie.GetStatus().ToString().ToLowerInvariant()">
 
-                    <div class="card movie-card shadow-sm">
+                    <div class="card movie-card shadow-sm h-100">
 
                         <div class="card-body">
 
                             <h2 class="card-title h5">
-                                @movie.Title
+                                @movie.GetTitle()
                             </h2>
 
                             <p class="card-text text-muted">
-                                @movie.Overview
+                                @movie.GetSynopsis()
                             </p>
 
                         </div>
@@ -64,3 +99,7 @@
     }
 
 </div>
+
+@section Scripts {
+    <script src="~/js/library.js"></script>
+}
