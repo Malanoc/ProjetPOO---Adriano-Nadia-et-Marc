@@ -23,3 +23,17 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.Run();
+
+using Movie_Library.Classes;
+
+class Program
+{
+    static void Main()
+    {
+        Movie movie = new Movie();
+
+        movie.ModifyStatus(Status.Seen);
+
+        Console.WriteLine(movie.GetStatus());
+    }
+}
