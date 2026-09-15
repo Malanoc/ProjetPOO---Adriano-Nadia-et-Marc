@@ -9,7 +9,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -23,17 +22,3 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.Run();
-
-using Movie_Library.Classes;
-
-class Program
-{
-    static void Main()
-    {
-        Movie movie = new Movie();
-
-        movie.ModifyStatus(Status.Seen);
-
-        Console.WriteLine(movie.GetStatus());
-    }
-}
