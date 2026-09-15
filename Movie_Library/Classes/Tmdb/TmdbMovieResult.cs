@@ -1,19 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace Movie_Library.Classes.Tmdb
 {
     /// <summary>
     /// Représente un film retourné par l'API TMDB.
     ///
-    /// Cette classe ne représente pas directement un film
-    /// de notre bibliothèque. Elle sert uniquement à récupérer
-    /// et convertir les données JSON envoyées par TMDB.
+    /// Cette classe sert uniquement à convertir
+    /// les informations JSON de TMDB.
     /// </summary>
     internal class TmdbMovieResult
     {
         /// <summary>
-        /// Identifiant unique TMDB.
+        /// Identifiant unique du film sur TMDB.
         /// </summary>
         [JsonPropertyName("id")]
         public int Id { get; set; }
@@ -27,23 +25,23 @@ namespace Movie_Library.Classes.Tmdb
 
 
         /// <summary>
-        /// Résumé du film.
+        /// Synopsis du film.
         /// </summary>
         [JsonPropertyName("overview")]
         public string Overview { get; set; } = string.Empty;
 
 
         /// <summary>
-        /// Date de sortie.
-        /// </summary>
-        [JsonPropertyName("release_date")]
-        public string ReleaseDate { get; set; } = string.Empty;
-
-
-        /// <summary>
-        /// Chemin de l'affiche.
+        /// Chemin vers le poster du film.
         /// </summary>
         [JsonPropertyName("poster_path")]
         public string? PosterPath { get; set; }
+
+
+        /// <summary>
+        /// Score du film provenant de TMDB.
+        /// </summary>
+        [JsonPropertyName("vote_average")]
+        public float VoteAverage { get; set; }
     }
 }

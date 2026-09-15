@@ -118,23 +118,23 @@ namespace Movie_Library.Classes
         public void addMovies(Movie movie)
         {
             /*
-             * Vérifie d'abord qu'un film avec le même ID TMDB
-             * n'est pas déjà présent.
-             *
-             * Cela permet d'éviter les doublons.
+             * Vérifie si un film avec le même identifiant TMDB
+             * est déjà présent dans la bibliothèque.
              */
             bool movieAlreadyExists =
                 _movies.Any(existingMovie =>
-                    existingMovie.TmdbId == movie.TmdbId
+                    existingMovie.Id == movie.Id
                 );
 
-
-            /*
-             * On ajoute uniquement le film s'il n'existe pas déjà.
-             */
             if (!movieAlreadyExists)
             {
                 _movies.Add(movie);
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"Le film '{movie.Title}' est déjà présent dans la bibliothèque."
+                );
             }
         }
 
@@ -321,8 +321,9 @@ namespace Movie_Library.Classes
                     tmdbMovie.Id,
                     tmdbMovie.Title,
                     tmdbMovie.Overview,
-                    tmdbMovie.ReleaseDate,
-                    tmdbMovie.PosterPath
+                    tmdbMovie.PosterPath ?? "",
+                    tmdbMovie.VoteAverage,
+                    Status.NotSeen
                 );
 
 
@@ -344,8 +345,7 @@ namespace Movie_Library.Classes
                 Movie? existingMovie =
                     _movies.FirstOrDefault(
                         libraryMovie =>
-                            libraryMovie.TmdbId ==
-                            movie.TmdbId
+                            libraryMovie.Id == movie.Id
                     );
 
 

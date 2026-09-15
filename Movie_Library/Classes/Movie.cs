@@ -49,99 +49,127 @@ namespace Movie_Library.Classes
         /// </summary>
         private Status _status;
 
+
         /// <summary>
-        /// Méthode pour récupérer le titre.
+        /// Constructeur de la classe Movie
+        /// </summary>
+        /// <param name="id">L'id du film.</param>
+        /// <param name="title">Le titre du film.</param>
+        /// <param name="synopsis">Le synopsis du film.</param>
+        /// <param name="poster">Le poster du film.</param>
+        /// <param name="ratingTMBD">Le score TMDB.</param>
+        /// <param name="status">Le statut de visionnage initial.</param>
+        public Movie (int id, string title, string synopsis, string poster, float ratingTMBD, Status status)
+        {
+            _id = id;
+            _title = title;
+            _synopsis = synopsis;
+            _poster = poster;
+            _ratingTMDB = ratingTMBD;
+            _status = status;
+
+            // Initialisation des données personnelles par défaut.
+            _personalRating = 0;
+            _personalNote = "";
+        }
+
+       
+        /// <summary>
+        /// Lecture seule du titre du film.
         /// </summary>
         /// <returns></returns>
-
-        public string GetTitle()
+        public string Title
         {
-            return _title;
+           get { return _title; }
         }
 
         /// <summary>
-        /// Méthode pour récupérer le synopsis
+        /// Lecture seule de l'identifiant du film.
+        /// </summary>
+        public int Id
+        {
+            get { return _id; }
+        }
+
+        /// <summary>
+        /// Lecture seule du synposis du film.
         /// </summary>
         /// <returns></returns>
-        public string GetSynopsis()
+        public string Synopsis
         {
-            return _synopsis;
+            get{ return _synopsis; }
         }
 
        /// <summary>
-       /// Méthode pour récupérer le poster d'un film
+       /// Lecture seule du poster du film.
        /// </summary>
        /// <returns></returns>
-        public string GetPoster()
+        public string Poster
         {
-           return _poster; 
+           get { return _poster; }
         }
 
         /// <summary>
-        /// Méthode pour récupérer le rating TMDB pour un film
+        /// Lecture seule du score TMDB.
         /// </summary>
         /// <returns></returns>
-        public float GetRatingTMDB()
+        
+        public float RatingTMDB
 
         {
-           return _ratingTMDB; 
+           get{ return _ratingTMDB; }
         }
 
+        
         /// <summary>
-        /// Méthode pour récupérer le score personnel d'un film de l'utilisateur 
+        /// Lecture et modification du score personnel de l'utilisateur.
         /// </summary>
         /// <returns></returns>
-
-        public float GetPersonalRating()
+        public float PersonalRating
 
         {
-            return _personalRating;
+            get { return _personalRating; }
+            set { _personalRating = value; }
         }
 
-        /// <summary>
-        /// Méthode pour récupérer les notes personelles de l'utilisateur d'un film
-        /// </summary>
-        /// <returns></returns>
-
-        public string GetPersonalNote()
+       /// <summary>
+       /// Lecture et modification de la note personnel de l'utilisateur. 
+       /// </summary>
+       /// <returns></returns>
+        public string PersonalNote
 
          {
-            return _personalNote; 
+            get { return _personalNote; }
+            set { _personalNote = value; }
             
         }
 
-          /// <summary>
-          /// Méthode pour récupérer le statut de visionnage d'un film
-          /// </summary>
+         
 
-        public Status GetStatus()
+        /// <summary>
+        /// Lecture et modification du statut de visionnage.
+        /// </summary>
+        /// <returns></returns>
+        public Status Status
 
         { 
-           return _status; 
+           get { return _status; }
+           set 
+            {
+                if (_status != value)
+                {
+                    _status = value;
+                    Console.WriteLine($"Le statut a été modifié : {value}.");
+                }
+                else
+                {
+                    Console.WriteLine($"Le film est déjà au statut : {value}.");
+                }
+
+            }
         } 
         
-        /// <summary>
-        /// Méthode pour mettre le score de l'utilisateur sur un film
-        /// </summary>
-        /// <param name="PersonalRating"></param>
-        /// <returns></returns>
-
-        public void SetPersonalRating  (float personalRating)
-        { 
-            _personalRating= personalRating; 
-        }
-
-        /// <summary>
-        /// Méthode pour écrire des notes personnelles sur un film
-        /// </summary>
-        /// <param name="note"></param>
-        /// <returns></returns>
-
-        public void SetPersonalNote(string note)
-        {
-            _personalNote = note;
-        }
-
+    
 
         /// <summary>
         /// Supprime les notes personnelles sur un film.
@@ -160,24 +188,6 @@ namespace Movie_Library.Classes
             }
             
         }
-
-        /// <summary>
-        ///  Modifie le statut de visionnage (seen, not seen, in progress)
-        /// </summary>
-        /// <param name="status"></param>
-        public void ModifyStatus(Status status) 
-        {
-            if (_status != status)
-            {
-                _status = status;
-                Console.WriteLine($"Le statut a été modifié : {status}.");
-            }
-            else
-            {
-                Console.WriteLine($"Le film est déjà au statut : {status}.");
-            }
-        }
-		
 
 	}
 }
