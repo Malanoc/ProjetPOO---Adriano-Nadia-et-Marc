@@ -72,20 +72,20 @@
 
             @foreach (var movie in Model.Library.Movies)
             {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 movie-item"
-                     data-title="@movie.GetTitle()"
-                     data-status="@movie.GetStatus().ToString().ToLowerInvariant()">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 movie-item">
+                     data-title="@movie.Title"
+                     data-status="@movie.Status.ToString().ToLowerInvariant()"
 
                     <div class="card movie-card shadow-sm h-100">
 
                         <div class="card-body">
 
                             <h2 class="card-title h5">
-                                @movie.GetTitle()
+                                @movie.Title
                             </h2>
 
                             <p class="card-text text-muted">
-                                @movie.GetSynopsis()
+                                @movie.Synopsis
                             </p>
 
                         </div>
