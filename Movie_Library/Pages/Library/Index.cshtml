@@ -5,101 +5,212 @@
     ViewData["Title"] = "Ma bibliothèque";
 }
 
-<div class="container py-4">
+<div class="library-page">
 
-    <div class="library-header">
-        <h1>Ma bibliothèque</h1>
+    <div class="container">
 
-        <p class="text-muted">
-            Retrouvez tous les films que vous avez enregistrés.
-        </p>
-    </div>
+        <!-- HEADER -->
 
-    <div class="library-toolbar mb-4">
+        <header class="library-header">
 
-        <div class="row g-3 align-items-end">
+            <div>
 
-            <div class="col-12 col-md-6">
-                <label for="sort" class="form-label">
-                    Trier par
-                </label>
+                <span class="home-kicker">
+                    Votre cinémathèque
+                </span>
 
-                <select id="sort" class="form-select">
-                    <option value="title">Titre</option>
-                    <option value="rating">Note</option>
-                    <option value="status">Statut</option>
-                </select>
+                <h1>
+                    Ma bibliothèque
+                </h1>
+
+                <p>
+                    Les films que vous avez décidé de garder.
+                </p>
+
             </div>
 
-            <div class="col-12 col-md-6">
-                <label for="status" class="form-label">
-                    Filtrer par statut
-                </label>
+            <div class="library-count">
 
-                <select id="status" class="form-select">
-                    <option value="all">Tous les films</option>
-                    <option value="notseen">Non vus</option>
-                    <option value="inprogress">En cours</option>
-                    <option value="seen">Vus</option>
-                </select>
+                @Model.Library.Movies.Count
+                film@(Model.Library.Movies.Count > 1 ? "s" : "")
+
+            </div>
+
+        </header>
+
+
+        <!-- FILTRES -->
+
+        <div class="library-toolbar">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-12 col-md-6">
+
+                    <label for="sort"
+                           class="form-label">
+
+                        Trier par
+
+                    </label>
+
+                    <select id="sort"
+                            class="form-select">
+
+                        <option value="title">
+                            Titre
+                        </option>
+
+                        <option value="rating">
+                            Note
+                        </option>
+
+                        <option value="status">
+                            Statut
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="col-12 col-md-6">
+
+                    <label for="status"
+                           class="form-label">
+
+                        Filtrer
+
+                    </label>
+
+                    <select id="status"
+                            class="form-select">
+
+                        <option value="all">
+                            Tous les films
+                        </option>
+
+                        <option value="notseen">
+                            Non vus
+                        </option>
+
+                        <option value="inprogress">
+                            En cours
+                        </option>
+
+                        <option value="seen">
+                            Vus
+                        </option>
+
+                    </select>
+
+                </div>
+
             </div>
 
         </div>
 
-    </div>
 
-    @if (Model.Library.Movies.Count == 0)
-    {
-        <div class="library-empty">
+        <!-- BIBLIOTHEQUE VIDE -->
+        @if (Model.Library.Movies.Count == 0)
+        {
+            <div class="library-empty">
 
-            <h2 class="h4">
-                Votre bibliothèque est vide
-            </h2>
+                <span class="home-kicker">
+                    Aucun film
+                </span>
 
-            <p class="text-muted">
-                Ajoutez des films depuis la recherche pour les retrouver ici.
-            </p>
+                <h2>
+                    Votre bibliothèque est encore vide.
+                </h2>
 
-            <a asp-page="/Movies/Index" class="btn btn-primary">
-                Rechercher des films
-            </a>
+                <p>
+                    Recherchez un film pour commencer à construire
+                    votre propre cinémathèque.
+                </p>
 
-        </div>
-    }
-    else
-    {
-        <div id="movie-grid" class="row g-4">
+                <a asp-page="/Movies/Index"
+                   class="btn btn-primary">
 
-            @foreach (var movie in Model.Library.Movies)
-            {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3 movie-item">
-                     data-title="@movie.Title"
-                     data-status="@movie.Status.ToString().ToLowerInvariant()"
+                    Rechercher un film
 
-                    <div class="card movie-card shadow-sm h-100">
+                </a>
 
-                        <div class="card-body">
+            </div>
+        }
+        else
+        {
 
-                            <h2 class="card-title h5">
-                                @movie.Title
-                            </h2>
+            <!-- FILMS -->
 
-                            <p class="card-text text-muted">
-                                @movie.Synopsis
-                            </p>
+            <div id="movie-grid"
+                 class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 movie-grid">
 
-                        </div>
+                @foreach (var movie in Model.Library.Movies)
+                {
+
+                    <div class="col movie-item"
+                         data-title="@movie.Title"
+                         data-status="@movie.Status.ToString().ToLowerInvariant()">
+
+                        <article class="movie-card">
+
+                            <div class="movie-poster">
+
+                                @if (!string.IsNullOrWhiteSpace(movie.Poster))
+                                {
+                                    <img src="@movie.Poster"
+                                         alt="@movie.Title"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="movie-poster-placeholder">
+                                        Pas d'affiche
+                                    </div>
+                                }
+
+                            </div>
+
+
+                            <div class="movie-info">
+
+                                <h2 class="movie-title">
+                                    @movie.Title
+                                </h2>
+
+                                <div class="movie-meta">
+
+                                    <span>
+                                        @movie.Status
+                                    </span>
+
+                                    @if (movie.RatingTMDB > 0)
+                                    {
+                                        <span class="movie-rating">
+                                            @movie.RatingTMDB.ToString("0.0") / 10
+                                        </span>
+                                    }
+
+                                </div>
+
+                            </div>
+
+                        </article>
 
                     </div>
 
-                </div>
-            }
+                }
 
-        </div>
-    }
+            </div>
+        }
+
+    </div>
 
 </div>
 
 @section Scripts {
+
     <script src="~/js/library.js"></script>
+
 }
