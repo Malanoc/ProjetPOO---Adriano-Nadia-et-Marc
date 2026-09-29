@@ -1,7 +1,18 @@
+using Movie_Library.Classes;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+// Backend API REST.
+builder.Services.AddControllers();
+
+// Une seule bibliothèque partagée dans toute l'application.
+builder.Services.AddSingleton<Library>(
+    _ => new Library("Ma bibliothèque")
+);
 
 var app = builder.Build();
 
@@ -20,5 +31,8 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+// Active les routes /api/...
+app.MapControllers();
 
 app.Run();
