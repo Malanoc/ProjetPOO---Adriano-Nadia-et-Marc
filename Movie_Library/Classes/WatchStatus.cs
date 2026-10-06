@@ -2,7 +2,7 @@
 
 namespace Movie_Library.Classes
 {
-    internal enum Status
+    public enum Status
     {
         Seen,
         NotSeen,

@@ -7,7 +7,7 @@ namespace Movie_Library.Classes.Tmdb
     /// Représente la réponse globale retournée par TMDB
     /// lors d'une recherche de films.
     /// </summary>
-    internal class TmdbSearchResponse
+    public class TmdbSearchResponse
     {
         /// <summary>
         /// Liste des films trouvés.

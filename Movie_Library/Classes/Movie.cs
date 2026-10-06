@@ -6,7 +6,7 @@ namespace Movie_Library.Classes
     /// <summary>
     /// Classe Movie qui représente un film.
     /// </summary>
-	internal class Movie
+	public class Movie
 	{
         /// <summary>
         /// L'id du film.

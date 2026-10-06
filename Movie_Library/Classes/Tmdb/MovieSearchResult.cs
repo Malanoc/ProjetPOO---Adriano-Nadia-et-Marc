@@ -15,7 +15,7 @@ namespace Movie_Library.Classes.Tmdb
     ///   films trouvés par TMDB mais qui sont déjà
     ///   présents dans la bibliothèque.
     /// </summary>
-    internal class MovieSearchResult
+    public class MovieSearchResult
     {
         /// <summary>
         /// Films trouvés qui peuvent être ajoutés
