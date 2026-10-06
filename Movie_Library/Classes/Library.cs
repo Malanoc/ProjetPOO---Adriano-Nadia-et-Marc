@@ -1,11 +1,8 @@
-﻿using DotNetEnv;
-using Movie_Library.Classes.Tmdb;
+﻿using Movie_Library.Classes.Tmdb;
+using Movie_Library.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Movie_Library.Classes
@@ -27,74 +24,58 @@ namespace Movie_Library.Classes
         /// </summary>
         private List<Movie> _movies;
 
+
         /// <summary>
-        /// Liste des collections personnelles dans la bibliothèque.
+        /// Liste des collections personnelles
+        /// dans la bibliothèque.
         /// </summary>
         private List<Collection> _collections;
 
 
         /// <summary>
-        /// HttpClient permet d'envoyer des requêtes HTTP.
-        ///
-        /// Nous l'utilisons pour communiquer avec l'API TMDB.
-        ///
-        /// Il est déclaré static afin de réutiliser la même instance
-        /// pendant toute la durée de l'application.
+        /// Service permettant de communiquer avec TMDB.
+        /// 
+        /// Library ne connaît pas le fonctionnement de TMDB.
+        /// Elle demande simplement à MoviesApi de rechercher
+        /// des films.
         /// </summary>
-        private static readonly HttpClient _httpClient = new HttpClient();
-
-
-        /// <summary>
-        /// Token permettant de s'authentifier auprès de TMDB.
-        ///
-        /// La valeur vient du fichier .env.
-        /// </summary>
-        private readonly string _tmdbApiToken;
+        private readonly MoviesApi _moviesApi;
 
 
         /// <summary>
         /// Constructeur de la classe Library.
         /// </summary>
-        /// <param name="name">Nom de la bibliothèque.</param>
+        /// <param name="name">
+        /// Nom de la bibliothèque.
+        /// </param>
         public Library(string name)
         {
             _name = name;
 
             /*
-             * Au moment de créer une bibliothèque,
-             * sa liste de films et de collections est vide.
+             * Initialisation de la liste des films.
              */
             _movies = new List<Movie>();
+
+
+            /*
+             * Initialisation de la liste des collections.
+             */
             _collections = new List<Collection>();
 
 
             /*
-             * Charge le fichier .env.
-             *
-             * TraversePath permet également de chercher le fichier
-             * dans les dossiers parents si nécessaire.
+             * Création du service chargé de communiquer
+             * avec TMDB.
              */
-            Env.TraversePath().Load();
-
-
-            /*
-             * Récupère le token TMDB depuis le fichier .env.
-             *
-             * Si la variable n'existe pas, nous arrêtons le programme
-             * avec une erreur explicite.
-             */
-            _tmdbApiToken =
-                Environment.GetEnvironmentVariable("TMDB_API_TOKEN")
-                ?? throw new InvalidOperationException(
-                    "La variable TMDB_API_TOKEN est introuvable dans le fichier .env."
-                );
+            _moviesApi = new MoviesApi();
         }
 
 
         /// <summary>
-        /// Retourne tous les films présents dans la bibliothèque.
+        /// Retourne tous les films présents
+        /// dans la bibliothèque.
         /// </summary>
-        /// <returns>La liste des films.</returns>
         public List<Movie> Movies
         {
             get { return _movies; }
@@ -102,9 +83,9 @@ namespace Movie_Library.Classes
 
 
         /// <summary>
-        /// Retourne toutes les collections présentes dans la bibliothèque.
+        /// Retourne toutes les collections présentes
+        /// dans la bibliothèque.
         /// </summary>
-        /// <returns>La liste des collections.</returns>
         public List<Collection> Collections
         {
             get { return _collections; }
@@ -114,7 +95,9 @@ namespace Movie_Library.Classes
         /// <summary>
         /// Ajoute un film à la bibliothèque.
         /// </summary>
-        /// <param name="movie">Film à ajouter.</param>
+        /// <param name="movie">
+        /// Film à ajouter.
+        /// </param>
         public void addMovies(Movie movie)
         {
             /*
@@ -125,6 +108,7 @@ namespace Movie_Library.Classes
                 _movies.Any(existingMovie =>
                     existingMovie.Id == movie.Id
                 );
+
 
             if (!movieAlreadyExists)
             {
@@ -142,7 +126,9 @@ namespace Movie_Library.Classes
         /// <summary>
         /// Supprime un film de la bibliothèque.
         /// </summary>
-        /// <param name="movie">Film à supprimer.</param>
+        /// <param name="movie">
+        /// Film à supprimer.
+        /// </param>
         public void removeMovie(Movie movie)
         {
             _movies.Remove(movie);
@@ -150,197 +136,55 @@ namespace Movie_Library.Classes
 
 
         /// <summary>
-        /// Recherche des films avec l'API TMDB.
+        /// Recherche des films sur TMDB.
         ///
-        /// Tous les résultats trouvés sont ensuite comparés
-        /// avec les films présents dans la bibliothèque.
+        /// Les résultats sont séparés en deux listes :
         ///
-        /// La méthode retourne deux listes :
+        /// - FoundMovies :
+        ///   films qui ne sont pas encore
+        ///   dans la bibliothèque.
         ///
-        /// FoundMovies :
-        /// films qui ne sont pas encore dans la bibliothèque.
-        ///
-        /// AlreadyInLibrary :
-        /// films déjà présents dans la bibliothèque.
+        /// - AlreadyInLibrary :
+        ///   films déjà présents dans la bibliothèque.
         /// </summary>
-        /// <param name="title">Titre ou texte recherché.</param>
+        /// <param name="title">
+        /// Titre ou texte recherché.
+        /// </param>
         /// <returns>
-        /// Un objet MovieSearchResult contenant les deux listes.
+        /// Résultat contenant les films trouvés
+        /// et les films déjà présents.
         /// </returns>
-        public async Task<MovieSearchResult> searchMovie(string title)
+        public async Task<MovieSearchResult> searchMovie(
+            string title)
         {
             /*
-             * Création de l'objet qui contiendra
-             * les deux listes de résultats.
+             * Création du résultat de recherche.
              */
-            MovieSearchResult searchResult = new MovieSearchResult();
+            MovieSearchResult searchResult =
+                new MovieSearchResult();
 
 
             /*
-             * On vérifie que l'utilisateur a réellement
-             * entré quelque chose.
-             */
-            if (string.IsNullOrWhiteSpace(title))
-            {
-                return searchResult;
-            }
-
-
-            /*
-             * Uri.EscapeDataString transforme le texte afin
-             * qu'il puisse être utilisé dans une URL.
+             * MoviesApi effectue toute la communication
+             * avec TMDB.
              *
-             * Exemple :
-             *
-             * Le Seigneur des Anneaux
-             *
-             * devient quelque chose comme :
-             *
-             * Le%20Seigneur%20des%20Anneaux
+             * Library reçoit uniquement une liste de Movie.
              */
-            string encodedTitle =
-                Uri.EscapeDataString(title);
+            List<Movie> moviesFound =
+                await _moviesApi.SearchMoviesAsync(title);
 
 
             /*
-             * Construction de l'URL permettant de rechercher
-             * un film sur TMDB.
-             *
-             * query :
-             * texte recherché.
-             *
-             * language=fr-FR :
-             * demande les données traduites en français.
-             *
-             * include_adult=false :
-             * exclut les contenus pour adultes.
-             *
-             * page=1 :
-             * récupère la première page des résultats.
+             * Analyse de tous les films retournés par TMDB.
              */
-            string url =
-                $"https://api.themoviedb.org/3/search/movie" +
-                $"?query={encodedTitle}" +
-                $"&language=fr-FR" +
-                $"&include_adult=false" +
-                $"&page=1";
-
-
-            /*
-             * Création de la requête HTTP GET.
-             */
-            using HttpRequestMessage request =
-                new HttpRequestMessage(
-                    HttpMethod.Get,
-                    url
-                );
-
-
-            /*
-             * TMDB recommande d'utiliser le Read Access Token
-             * comme Bearer Token dans l'en-tête Authorization.
-             */
-            request.Headers.Authorization =
-                new AuthenticationHeaderValue(
-                    "Bearer",
-                    _tmdbApiToken
-                );
-
-
-            /*
-             * Nous indiquons que nous souhaitons recevoir
-             * la réponse au format JSON.
-             */
-            request.Headers.Accept.Add(
-                new MediaTypeWithQualityHeaderValue(
-                    "application/json"
-                )
-            );
-
-
-            /*
-             * Envoie la requête à TMDB.
-             *
-             * await attend la réponse sans bloquer
-             * inutilement l'application.
-             */
-            using HttpResponseMessage response =
-                await _httpClient.SendAsync(request);
-
-
-            /*
-             * Vérifie que la requête s'est correctement déroulée.
-             *
-             * Par exemple :
-             *
-             * 200 → OK
-             * 401 → problème de token
-             * 404 → ressource inexistante
-             */
-            response.EnsureSuccessStatusCode();
-
-
-            /*
-             * Récupère le JSON retourné par TMDB.
-             */
-            string json =
-                await response.Content.ReadAsStringAsync();
-
-
-            /*
-             * Transforme le JSON en objet C#.
-             */
-            TmdbSearchResponse? tmdbResponse =
-                JsonSerializer.Deserialize<TmdbSearchResponse>(
-                    json
-                );
-
-
-            /*
-             * Si l'API n'a retourné aucun résultat,
-             * nous retournons simplement les deux listes vides.
-             */
-            if (tmdbResponse == null ||
-                tmdbResponse.Results.Count == 0)
-            {
-                return searchResult;
-            }
-
-
-            /*
-             * Nous parcourons maintenant TOUS les films
-             * retournés par TMDB.
-             */
-            foreach (TmdbMovieResult tmdbMovie in tmdbResponse.Results)
+            foreach (Movie movie in moviesFound)
             {
                 /*
-                 * Transformation du film TMDB
-                 * en objet Movie utilisé par notre application.
-                 */
-                Movie movie = new Movie(
-                    tmdbMovie.Id,
-                    tmdbMovie.Title,
-                    tmdbMovie.Overview,
-                    tmdbMovie.PosterPath ?? "",
-                    tmdbMovie.VoteAverage,
-                    Status.NotSeen
-                );
-
-
-                /*
-                 * Recherche si ce film est déjà présent
+                 * Recherche si le film existe déjà
                  * dans notre bibliothèque.
                  *
-                 * Nous comparons les IDs TMDB.
-                 *
-                 * Exemple :
-                 *
-                 * The Batman (2022)
-                 * TMDB ID : 414906
-                 *
-                 * Si cet ID existe déjà dans _movies,
-                 * nous savons qu'il s'agit exactement
-                 * du même film.
+                 * L'identifiant utilisé est directement
+                 * l'identifiant TMDB.
                  */
                 Movie? existingMovie =
                     _movies.FirstOrDefault(
@@ -350,49 +194,46 @@ namespace Movie_Library.Classes
 
 
                 /*
-                 * Si le film existe déjà dans la bibliothèque,
-                 * nous l'ajoutons dans la liste
-                 * AlreadyInLibrary.
+                 * Le film existe déjà.
+                 *
+                 * On retourne l'objet présent dans la
+                 * bibliothèque afin de conserver notamment :
+                 *
+                 * - sa note personnelle ;
+                 * - sa note utilisateur ;
+                 * - son statut.
                  */
                 if (existingMovie != null)
                 {
-                    /*
-                     * On retourne volontairement l'objet déjà
-                     * présent dans notre bibliothèque.
-                     *
-                     * Ainsi, si notre Movie contient plus tard
-                     * des informations supplémentaires locales,
-                     * elles seront conservées.
-                     */
-                    searchResult.AlreadyInLibrary.Add(
-                        existingMovie
-                    );
+                    searchResult
+                        .AlreadyInLibrary
+                        .Add(existingMovie);
                 }
+
+
+                /*
+                 * Le film n'existe pas encore
+                 * dans la bibliothèque.
+                 */
                 else
                 {
-                    /*
-                     * Sinon, le film est disponible sur TMDB
-                     * mais n'existe pas encore dans la bibliothèque.
-                     */
-                    searchResult.FoundMovies.Add(
-                        movie
-                    );
+                    searchResult
+                        .FoundMovies
+                        .Add(movie);
                 }
             }
 
 
-            /*
-             * Retourne finalement les deux listes.
-             */
             return searchResult;
         }
 
 
         /// <summary>
-        /// Trie les films de la bibliothèque par titre.
+        /// Trie les films de la bibliothèque
+        /// par titre.
         /// </summary>
         /// <returns>
-        /// Nouvelle liste triée par ordre alphabétique.
+        /// Nouvelle liste de films triée.
         /// </returns>
         public List<Movie> sortMovie()
         {
@@ -405,12 +246,15 @@ namespace Movie_Library.Classes
         /// <summary>
         /// Ajoute une collection à la bibliothèque.
         /// </summary>
-        /// <param name="collection">Collection à ajouter.</param>
-        public void addCollection(Collection collection)
+        /// <param name="collection">
+        /// Collection à ajouter.
+        /// </param>
+        public void addCollection(
+            Collection collection)
         {
             /*
-             * Vérifie que la collection n'est pas déjà
-             * présente dans la liste avant de l'ajouter.
+             * Vérifie que la collection n'est pas
+             * déjà présente.
              */
             if (!_collections.Contains(collection))
             {
@@ -418,7 +262,9 @@ namespace Movie_Library.Classes
             }
             else
             {
-                Console.WriteLine("La collection est déjà présente dans la bibliothèque.");
+                Console.WriteLine(
+                    "La collection est déjà présente dans la bibliothèque."
+                );
             }
         }
 
@@ -426,8 +272,11 @@ namespace Movie_Library.Classes
         /// <summary>
         /// Supprime une collection de la bibliothèque.
         /// </summary>
-        /// <param name="collection">Collection à supprimer.</param>
-        public void removeCollection(Collection collection)
+        /// <param name="collection">
+        /// Collection à supprimer.
+        /// </param>
+        public void removeCollection(
+            Collection collection)
         {
             _collections.Remove(collection);
         }

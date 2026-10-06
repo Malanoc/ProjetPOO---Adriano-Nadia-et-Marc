@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.DependencyInjection;
 using LibraryClass = Movie_Library.Classes.Library;
 
 namespace Movie_Library.Pages.Library
@@ -7,9 +8,10 @@ namespace Movie_Library.Pages.Library
     {
         internal LibraryClass Library { get; private set; }
 
-        public IndexModel()
+        public IndexModel(IServiceProvider services)
         {
-            Library = new LibraryClass("Ma bibliothèque");
+            Library =
+                services.GetRequiredService<LibraryClass>();
         }
 
         public void OnGet()
