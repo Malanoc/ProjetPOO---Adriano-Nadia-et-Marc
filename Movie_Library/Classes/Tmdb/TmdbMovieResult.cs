@@ -8,7 +8,7 @@ namespace Movie_Library.Classes.Tmdb
     /// Cette classe sert uniquement à convertir
     /// les informations JSON de TMDB.
     /// </summary>
-    internal class TmdbMovieResult
+    public class TmdbMovieResult
     {
         /// <summary>
         /// Identifiant unique du film sur TMDB.

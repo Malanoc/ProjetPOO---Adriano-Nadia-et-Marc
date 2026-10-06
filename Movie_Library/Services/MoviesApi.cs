@@ -216,21 +216,20 @@ namespace Movie_Library.Services
              * le constructeur de Movie.
              */
             List<Movie> movies =
-                 tmdbResponse.Results
-                .Select(tmdbMovie =>
-                new Movie(
-                tmdbMovie.Id,
-                tmdbMovie.Title,
-                tmdbMovie.Overview,
-                string.IsNullOrWhiteSpace(tmdbMovie.PosterPath)
-                    ? ""
-                    : $"https://image.tmdb.org/t/p/w500{tmdbMovie.PosterPath}",
-                tmdbMovie.VoteAverage,
-                Status.NotSeen
-            )
-        )
-        .ToList();
-
+                tmdbResponse.Results
+                    .Select(tmdbMovie =>
+                        new Movie(
+                            tmdbMovie.Id,
+                            tmdbMovie.Title,
+                            tmdbMovie.Overview,
+                            string.IsNullOrWhiteSpace(tmdbMovie.PosterPath)
+                                ? ""
+                                : $"https://image.tmdb.org/t/p/w500{tmdbMovie.PosterPath}",
+                            tmdbMovie.VoteAverage,
+                            Status.NotSeen
+                        )
+                    )
+                    .ToList();
 
             return movies;
         }

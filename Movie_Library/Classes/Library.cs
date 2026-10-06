@@ -10,7 +10,7 @@ namespace Movie_Library.Classes
     /// <summary>
     /// Classe Library, qui représente une bibliothèque de films.
     /// </summary>
-    internal class Library
+    public class Library
     {
         /// <summary>
         /// Nom de la bibliothèque.

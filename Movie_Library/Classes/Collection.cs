@@ -11,7 +11,7 @@ namespace Movie_Library.Classes
     /// - un poster ;
     /// - une liste de films.
     /// </summary>
-    internal class Collection
+    public class Collection
     {
         // Nom de la collection.
         private string _name;
