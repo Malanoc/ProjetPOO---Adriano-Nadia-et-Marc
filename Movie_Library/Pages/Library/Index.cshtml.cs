@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Movie_Library.Classes;
 using Movie_Library.Data;
 using LibraryClass = Movie_Library.Classes.Library;
 
@@ -19,10 +20,10 @@ namespace Movie_Library.Pages.Library
 
         public async Task OnGetAsync()
         {
-            List<Movie_Library.Classes.Movie> movies =
+            List<Movie> movies =
                 await _mongoDbService.GetMoviesAsync();
 
-            foreach (Movie_Library.Classes.Movie movie in movies)
+            foreach (Movie movie in movies)
             {
                 Library.addMovies(movie);
             }
