@@ -1,5 +1,5 @@
 # ProjetPOO---Adriano-Nadia-et-Marc
-Movie library
+## Movie library
 
 # Structure du projet
 
@@ -83,18 +83,18 @@ Properties/	Configuration de lancement de l'application^
 
 Contient les classes principales de l'application :
 
-- `Movie.cs` — représente un film.
-- `Library.cs` — représente la bibliothèque personnelle.
-- `Collection.cs` — représente une collection de films.
+- `Movie.cs` — Représente un film.
+- `Library.cs` — Représente la bibliothèque personnelle.
+- `Collection.cs` — Représente une collection de films.
 - `WatchStatus.cs` — définit les différents statuts de visionnage.
 
 ### Classes/Tmdb/
 
 Contient les classes utilisées pour représenter les données reçues depuis l'API TMDB :
 
-- `MovieSearchResult.cs`
-- `TmdbMovieResult.cs`
-- `TmdbSearchResponse.cs`
+- `MovieSearchResult.cs` - Représente le résultat d'une recherche de films.
+- `TmdbMovieResult.cs` - Représente un film retourné par l'API TMDB.
+- `TmdbSearchResponse.cs` - Représente la réponse globale retournée par TMDB.
 
 ### Services/
 
@@ -108,24 +108,31 @@ Contient les éléments nécessaires à la configuration et à l'accès à Mongo
 
 - `MongoDbService.cs` — gère la communication avec MongoDB.
 
+### Controllers/
+
+Contient les routes de manipulation des données de films
+
+- `MoviesController.cs` - API REST permettant de manipuler les films de la bibliothèque.
+
 ### Pages/
 
 Contient les pages Razor de l'application.
 
-- `Pages/Movies/` — recherche et affichage des films.
-- `Pages/Library/` — gestion de la bibliothèque personnelle.
-- `Pages/Collections/` — gestion des collections personnalisées.
-- `Pages/Shared/` — éléments communs aux différentes pages.
+- `Movies/*` — recherche et affichage des films.
+- `Library/*` — gestion de la bibliothèque personnelle.
+- `Collections/*` — gestion des collections personnalisées.
+- `Shared/*` — éléments communs aux différentes pages.
 
 ### wwwroot/
 
 Contient les fichiers statiques utilisés par l'interface :
 
-- `css/` — fichiers CSS.
-- `js/` — fichiers JavaScript.
-- `images/` — images utilisées par l'application.
-- `lib/` — bibliothèques frontend.
+- `css/*` — fichiers CSS.
+- `js/*` — fichiers JavaScript.
+- `images/*` — images utilisées par l'application.
+- `lib/*` — bibliothèques frontend.
 
 ### Properties/
 
 Contient les fichiers de configuration liés au lancement de l'application, notamment `launchSettings.json`.
+
