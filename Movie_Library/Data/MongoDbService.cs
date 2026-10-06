@@ -44,9 +44,9 @@ namespace Movie_Library.Data
                 return true;
             }
             // Erreur si le serveur MongoDB est éteint
-            catch (Timeout)
+            catch (TimeoutException)
             {
-                ConsoleWriteLine("Le serveur MonogDB ne repond pas (Timeout). Est-il démarré?")
+                Console.WriteLine("Le serveur MonogDB ne repond pas (Timeout). Est-il démarré?");
                 return false;
 
             }
