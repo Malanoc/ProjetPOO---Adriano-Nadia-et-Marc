@@ -1,3 +1,29 @@
+/* =========================================================
+   VARIABLES / IDENTITÉ VISUELLE
+   ========================================================= */
+
+:root {
+    /* Couleurs principales */
+    --bg: #1b1d29;
+    --surface: #191716;
+    --surface-light: #24201E;
+    /* Texte */
+    --text: #E8E1D7;
+    --text-muted: #A69F96;
+    /* Couleur principale du site */
+    --accent: #C94B3C;
+    --accent-hover: #B64032;
+    /* Couleur secondaire */
+    --gold: #C9A96E;
+    /* Bordures */
+    --border: #35302C;
+}
+
+
+/* =========================================================
+   STRUCTURE GÉNÉRALE
+   ========================================================= */
+
 html {
     font-size: 14px;
     position: relative;
@@ -10,27 +36,16 @@ html {
     }
 }
 
-:root {
-    --bg: #1b1d29;
-    --surface: #191716;
-    --surface-light: #24201E;
-    --text: #E8E1D7;
-    --text-muted: #A69F96;
-    --accent: #C94B3C;
-    --accent-hover: #B64032;
-    --gold: #C9A96E;
-    --border: #35302C;
-}
-
 body {
     margin-bottom: 60px;
     background-color: var(--bg);
     color: var(--text);
 }
 
-/* =========================
-   GLOBAL
-   ========================= */
+
+/* =========================================================
+   ÉLÉMENTS HTML GÉNÉRAUX
+   ========================================================= */
 
 h1,
 h2,
@@ -53,9 +68,10 @@ a {
         color: var(--accent-hover);
     }
 
-/* =========================
-   FOCUS
-   ========================= */
+
+/* =========================================================
+   ACCESSIBILITÉ / FOCUS
+   ========================================================= */
 
 .btn:focus,
 .btn:active:focus,
@@ -65,21 +81,24 @@ a {
     box-shadow: 0 0 0 0.1rem var(--bg), 0 0 0 0.25rem var(--accent);
 }
 
-/* =========================
+
+/* =========================================================
    NAVIGATION
-   ========================= */
+   ========================================================= */
 
 .navbar {
     background-color: var(--bg) !important;
     border-bottom: 1px solid var(--border) !important;
 }
 
+/* Nom du site */
 .navbar-brand {
     color: var(--text) !important;
     font-weight: 700;
     letter-spacing: -0.02em;
 }
 
+/* Liens de navigation */
 .navbar .nav-link {
     color: var(--text-muted) !important;
     transition: color 0.2s ease;
@@ -90,6 +109,7 @@ a {
         color: var(--text) !important;
     }
 
+    /* Indicateur du lien actif */
     .navbar .nav-link.active {
         position: relative;
     }
@@ -101,12 +121,18 @@ a {
             right: 0;
             bottom: 4px;
             height: 2px;
-            background: var(--accent);
+            background-color: var(--accent);
         }
 
-/* =========================
+/* Icône du menu hamburger sur mobile */
+.navbar-toggler-icon {
+    background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23C94B3C' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E" ) !important;
+}
+
+
+/* =========================================================
    FOOTER
-   ========================= */
+   ========================================================= */
 
 .footer {
     background-color: var(--bg);
@@ -122,10 +148,12 @@ a {
             color: var(--text);
         }
 
-/* =========================
-   BOUTONS
-   ========================= */
 
+/* =========================================================
+   BOUTONS
+   ========================================================= */
+
+/* Bouton principal */
 .btn-primary {
     background-color: var(--accent);
     border-color: var(--accent);
@@ -138,6 +166,7 @@ a {
         color: #fff;
     }
 
+/* Bouton avec contour */
 .btn-outline-primary {
     color: var(--text);
     border-color: var(--border);
@@ -149,6 +178,7 @@ a {
         color: var(--text);
     }
 
+/* Bouton secondaire */
 .btn-outline-secondary {
     color: var(--text-muted);
     border-color: var(--border);
@@ -160,9 +190,10 @@ a {
         color: var(--text);
     }
 
-/* =========================
+
+/* =========================================================
    FORMULAIRES
-   ========================= */
+   ========================================================= */
 
 .form-control,
 .form-select {
@@ -171,10 +202,12 @@ a {
     border-color: var(--border);
 }
 
+    /* Texte indicatif dans les champs */
     .form-control::placeholder {
         color: #736D67;
     }
 
+    /* Champs lorsqu'ils sont sélectionnés */
     .form-control:focus,
     .form-select:focus {
         background-color: var(--surface);
@@ -182,19 +215,22 @@ a {
         border-color: var(--accent);
     }
 
+    /* Options des listes déroulantes */
     .form-select option {
         background-color: var(--surface);
         color: var(--text);
     }
 
-/* =========================
-   ACCUEIL
-   ========================= */
+
+/* =========================================================
+   PAGE D'ACCUEIL
+   ========================================================= */
 
 .home-page {
     padding-top: 2rem;
 }
 
+/* Petit titre au-dessus des grands titres */
 .home-kicker {
     display: inline-block;
     margin-bottom: 1.5rem;
@@ -205,11 +241,13 @@ a {
     text-transform: uppercase;
 }
 
+/* Section principale */
 .home-hero {
     padding: 5rem 0 6rem;
     border-bottom: 1px solid var(--border);
 }
 
+    /* Grand titre */
     .home-hero h1 {
         max-width: 700px;
         font-size: clamp(2.8rem, 5vw, 4.2rem);
@@ -217,10 +255,12 @@ a {
         letter-spacing: -0.04em;
     }
 
+        /* Partie accentuée du titre */
         .home-hero h1 span {
             color: var(--accent);
         }
 
+    /* Description principale */
     .home-hero p {
         max-width: 650px;
         margin-top: 2rem;
@@ -228,6 +268,7 @@ a {
         line-height: 1.8;
     }
 
+/* Boutons du hero */
 .home-actions {
     margin-top: 2.5rem;
 }
@@ -238,12 +279,15 @@ a {
     }
 
 
-/* section */
+/* =========================================================
+   SECTIONS DE LA PAGE D'ACCUEIL
+   ========================================================= */
 
 .home-section {
     padding: 5rem 0;
 }
 
+/* Titre + description d'une section */
 .home-section-heading {
     display: flex;
     justify-content: space-between;
@@ -259,12 +303,15 @@ a {
     }
 
     .home-section-heading p {
-        margin: 0;
         max-width: 450px;
+        margin: 0;
         text-align: right;
     }
 
-/* features */
+
+/* =========================================================
+   FONCTIONNALITÉS DE LA PAGE D'ACCUEIL
+   ========================================================= */
 
 .home-feature {
     height: 100%;
@@ -272,6 +319,7 @@ a {
     border-top: 1px solid var(--border);
 }
 
+/* Numéro de fonctionnalité */
 .home-feature-number {
     color: var(--accent);
     font-size: 0.8rem;
@@ -279,17 +327,22 @@ a {
     letter-spacing: 0.1em;
 }
 
+/* Titre de la fonctionnalité */
 .home-feature h3 {
     margin-top: 1rem;
     margin-bottom: 0.75rem;
     font-size: 1.35rem;
 }
 
+/* Description */
 .home-feature p {
     line-height: 1.7;
 }
 
-/* CTA */
+
+/* =========================================================
+   BLOC D'APPEL À L'ACTION
+   ========================================================= */
 
 .home-cta {
     margin-bottom: 4rem;
@@ -307,14 +360,16 @@ a {
         margin-bottom: 0;
     }
 
-/* =========================
-   BIBLIOTHEQUE
-   ========================= */
+
+/* =========================================================
+   PAGE BIBLIOTHÈQUE
+   ========================================================= */
 
 .library-page {
     padding-top: 3rem;
 }
 
+/* En-tête de la bibliothèque */
 .library-header {
     display: flex;
     justify-content: space-between;
@@ -333,13 +388,17 @@ a {
         margin: 0.75rem 0 0;
     }
 
+/* Nombre de films */
 .library-count {
     color: var(--text-muted);
     font-size: 0.9rem;
     white-space: nowrap;
 }
 
-/* toolbar */
+
+/* =========================================================
+   FILTRES DE LA BIBLIOTHÈQUE
+   ========================================================= */
 
 .library-toolbar {
     margin-bottom: 3rem;
@@ -362,7 +421,10 @@ a {
         border-radius: 3px;
     }
 
-/* empty */
+
+/* =========================================================
+   BIBLIOTHÈQUE VIDE
+   ========================================================= */
 
 .library-empty {
     padding: 6rem 1rem;
@@ -380,14 +442,16 @@ a {
         margin: 0 auto 1.5rem;
     }
 
-/* =========================
-   FILMS
-   ========================= */
+
+/* =========================================================
+   GRILLE DE FILMS
+   ========================================================= */
 
 .movie-grid {
     row-gap: 3rem !important;
 }
 
+/* Élément individuel de la grille */
 .movie-item {
     transition: transform 0.2s ease;
 }
@@ -396,12 +460,22 @@ a {
         transform: translateY(-5px);
     }
 
+
+/* =========================================================
+   CARTE D'UN FILM
+   ========================================================= */
+
 .movie-card {
     height: 100%;
     overflow: hidden;
     background: transparent;
     border: none !important;
 }
+
+
+/* =========================================================
+   AFFICHE DU FILM
+   ========================================================= */
 
 .movie-poster {
     width: 100%;
@@ -411,6 +485,7 @@ a {
     border: 1px solid var(--border);
 }
 
+    /* Image de l'affiche */
     .movie-poster img {
         width: 100%;
         height: 100%;
@@ -418,10 +493,12 @@ a {
         transition: transform 0.4s ease, opacity 0.4s ease;
     }
 
+/* Petit effet au survol */
 .movie-card:hover .movie-poster img {
     transform: scale(1.035);
 }
 
+/* Remplacement lorsqu'aucune affiche n'est disponible */
 .movie-poster-placeholder {
     display: flex;
     align-items: center;
@@ -433,10 +510,16 @@ a {
     text-transform: uppercase;
 }
 
+
+/* =========================================================
+   INFORMATIONS DU FILM
+   ========================================================= */
+
 .movie-info {
     padding-top: 1rem;
 }
 
+/* Titre */
 .movie-title {
     margin: 0;
     color: var(--text);
@@ -444,6 +527,7 @@ a {
     font-weight: 600;
 }
 
+/* Informations secondaires */
 .movie-meta {
     display: flex;
     justify-content: space-between;
@@ -453,15 +537,19 @@ a {
     font-size: 0.8rem;
 }
 
+/* Note TMDB / note personnelle */
 .movie-rating {
     color: var(--gold);
 }
 
-/* =========================
-   RESPONSIVE
-   ========================= */
+
+/* =========================================================
+   RESPONSIVE — PETITS ÉCRANS
+   ========================================================= */
 
 @media (max-width: 767px) {
+
+    /* -------- Accueil -------- */
 
     .home-page {
         padding-top: 0;
@@ -476,6 +564,8 @@ a {
         }
 
 
+    /* -------- En-têtes -------- */
+
     .home-section-heading,
     .library-header {
         display: block;
@@ -485,6 +575,9 @@ a {
             margin-top: 1rem;
             text-align: left;
         }
+
+
+        /* -------- Bibliothèque -------- */
 
         .library-header h1 {
             font-size: 2.8rem;
