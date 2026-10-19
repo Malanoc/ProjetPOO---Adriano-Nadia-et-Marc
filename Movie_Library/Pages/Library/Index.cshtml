@@ -129,6 +129,7 @@
                                 @movie.Title
                             </h2>
 
+                            <!-- Statut et note TMDB -->
                             <div class="movie-meta">
                                 <span class="movie-status-label">
                                     @movie.Status
@@ -141,6 +142,17 @@
                                     </span>
                                 }
                             </div>
+
+                            <!-- Note personnelle : affichée uniquement si une note existe -->
+                            @if (movie.PersonalRating > 0)
+                            {
+                                <p class="movie-personal-rating">
+                                    Note personnelle :
+                                    <span>
+                                        @movie.PersonalRating.ToString("0.0") / 10
+                                    </span>
+                                </p>
+                            }
 
                         </div>
                     </article>

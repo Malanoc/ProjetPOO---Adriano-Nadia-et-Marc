@@ -537,11 +537,33 @@ a {
     font-size: 0.8rem;
 }
 
-/* Note TMDB / note personnelle */
+
+/* Note TMDB et note personnelle */
 .movie-rating {
     color: var(--gold);
+    font-size: 0.8rem;
+    white-space: nowrap;
 }
 
+/* Ligne de la note personnelle */
+.movie-personal-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+    /* Valeur de la note personnelle */
+    .movie-personal-rating span {
+        color: var(--gold);
+        font-size: 0.8rem;
+        font-weight: 400;
+        white-space: nowrap;
+    }
 
 /* =========================================================
    RESPONSIVE — PETITS ÉCRANS
