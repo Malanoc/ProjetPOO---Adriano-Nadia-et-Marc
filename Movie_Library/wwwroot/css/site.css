@@ -126,7 +126,7 @@ a {
 
 /* Icône du menu hamburger sur mobile */
 .navbar-toggler-icon {
-    background-image: url( "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23C94B3C' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E" ) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23C94B3C' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
 }
 
 
@@ -538,7 +538,11 @@ a {
 }
 
 
-/* Note TMDB et note personnelle */
+/* =========================================================
+   NOTES TMDB ET PERSONNELLES
+   ========================================================= */
+
+/* Note TMDB */
 .movie-rating {
     color: var(--gold);
     font-size: 0.8rem;
@@ -557,8 +561,15 @@ a {
     font-size: 0.8rem;
 }
 
-    /* Valeur de la note personnelle */
-    .movie-personal-rating span {
+    /* Libellé  */
+    .movie-personal-rating span:first-child {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 400;
+    }
+
+    /* Valeur de la note personnelle  */
+    .movie-personal-rating span:last-child {
         color: var(--gold);
         font-size: 0.8rem;
         font-weight: 400;
@@ -571,8 +582,7 @@ a {
 
 @media (max-width: 767px) {
 
-    /* -------- Accueil -------- */
-
+    /* Accueil */
     .home-page {
         padding-top: 0;
     }
@@ -585,9 +595,7 @@ a {
             font-size: 3.4rem;
         }
 
-
-    /* -------- En-têtes -------- */
-
+    /* En-têtes */
     .home-section-heading,
     .library-header {
         display: block;
@@ -598,9 +606,7 @@ a {
             text-align: left;
         }
 
-
-        /* -------- Bibliothèque -------- */
-
+        /* Bibliothèque */
         .library-header h1 {
             font-size: 2.8rem;
         }
@@ -610,10 +616,13 @@ a {
         margin-top: 1rem;
     }
 }
+
+
 /* =========================================================
    MODALE DE GESTION D'UN FILM
    ========================================================= */
 
+/* Les cartes de la bibliothèque sont interactives. */
 .movie-item {
     cursor: pointer;
 }
@@ -623,6 +632,7 @@ a {
         outline-offset: 5px;
     }
 
+/* Conteneur de la modale */
 .movie-modal-content {
     color: var(--text);
     background-color: var(--bg);
@@ -630,24 +640,29 @@ a {
     border-radius: 6px;
 }
 
+    /* Séparateurs de la modale */
     .movie-modal-content .modal-header,
     .movie-modal-content .modal-footer {
         border-color: var(--border);
     }
 
+    /* Titre de la modale */
     .movie-modal-content .modal-title {
         color: var(--text);
     }
 
+    /* Bouton de fermeture */
     .movie-modal-content .btn-close {
         filter: invert(1);
     }
 
+    /* Libellés des formulaires */
     .movie-modal-content .form-label {
         color: var(--text);
         font-weight: 600;
     }
 
+/* Affichage de la note TMDB dans la modale */
 .movie-modal-rating {
     display: flex;
     justify-content: space-between;
@@ -658,6 +673,7 @@ a {
         color: var(--gold);
     }
 
+/* Champs de formulaire dans la modale */
 .movie-modal-content .form-control,
 .movie-modal-content .form-select {
     background-color: var(--surface);
@@ -671,11 +687,13 @@ a {
         box-shadow: 0 0 0 0.2rem rgba(201, 75, 60, 0.2);
     }
 
+/* Séparateur dans le corps de la modale */
 .movie-modal-content .modal-body hr {
     border-color: var(--border);
     opacity: 1;
 }
 
+/* Adaptation de la modale sur mobile */
 @media (max-width: 575px) {
     .movie-modal-content .modal-dialog {
         margin: 0.5rem;
@@ -692,4 +710,61 @@ a {
         .movie-modal-content .modal-footer > * {
             margin: 0;
         }
+}
+
+
+/* =========================================================
+   RÉSULTATS DE RECHERCHE DE FILMS
+   ========================================================= */
+
+/* Les cartes de recherche ouvrent une modale de détails. */
+.movie-search-item {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+    .movie-search-item:hover {
+        transform: translateY(-4px);
+    }
+
+/* Indication discrète : cliquer pour afficher les détails. */
+.movie-search-hint,
+.movie-search-status {
+    margin-top: 0.55rem;
+    margin-bottom: 0;
+    font-size: 0.75rem;
+}
+
+/* Indication affichée au survol ou au focus clavier. */
+.movie-search-hint {
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.movie-search-item:hover .movie-search-hint,
+.movie-search-item:focus-visible .movie-search-hint {
+    opacity: 1;
+}
+
+/* Film déjà présent dans la bibliothèque. */
+.movie-search-status {
+    color: var(--accent);
+}
+
+/* Focus visible pour la navigation au clavier. */
+.movie-search-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 5px;
+}
+
+/* Lecture confortable du synopsis dans la modale de recherche. */
+.search-movie-modal-synopsis {
+    line-height: 1.75;
+    white-space: pre-line;
+}
+
+/* Espacement vertical des résultats de recherche. */
+.movies-page .movie-grid {
+    row-gap: 2.5rem !important;
 }
