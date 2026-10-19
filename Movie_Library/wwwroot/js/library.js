@@ -1,9 +1,14 @@
 ﻿document.addEventListener("DOMContentLoaded", () => {
     const sortSelect = document.getElementById("sort");
+    const sortDirectionSelect =
+        document.getElementById("sort-direction");
+
     const statusSelect = document.getElementById("status");
     const movieGrid = document.getElementById("movie-grid");
 
-    const movieModalElement = document.getElementById("movie-details-modal");
+    const movieModalElement =
+        document.getElementById("movie-details-modal");
+
     const movieCount = document.getElementById("library-count");
     const emptyState = document.getElementById("library-empty-state");
 
@@ -12,14 +17,14 @@
         return;
     }
 
-    // Ordre utilisé pour le tri des statuts.
+    // Ordre des statuts utilisé pour le tri.
     const statusOrder = {
         notseen: 0,
         inprogress: 1,
         seen: 2
     };
 
-    // Correspondance entre les statuts et leur libellé affiché.
+    // Libellés visibles des statuts.
     const statusLabels = {
         NotSeen: "Non vu",
         InProgress: "En cours",
@@ -28,24 +33,24 @@
 
     let selectedCard = null;
 
-    // Initialise Bootstrap Modal si Bootstrap est disponible.
+    // Initialise Bootstrap Modal si disponible.
     const modal = movieModalElement && window.bootstrap
         ? bootstrap.Modal.getOrCreateInstance(movieModalElement)
         : null;
 
 
-    // =================
+    // =====================================================
     // TRI ET FILTRAGE
-    // =================
+    // =====================================================
 
-    // Récupère les cartes présentes dans la grille.
+    // Récupère les cartes de films.
     function getMovieCards() {
         return Array.from(
             movieGrid.querySelectorAll(".movie-item")
         );
     }
 
-    // Trie les films selon l'option sélectionnée.
+    // Trie les films selon le critère et le sens choisis.
     function sortMovies() {
         if (!sortSelect) {
             return;
@@ -54,21 +59,27 @@
         const cards = getMovieCards();
         const selectedSort = sortSelect.value;
 
+        // 1 = croissant, -1 = décroissant.
+        const direction =
+            sortDirectionSelect?.value === "desc" ? -1 : 1;
+
         cards.sort((a, b) => {
             const titleA = (a.dataset.title || "").trim();
             const titleB = (b.dataset.title || "").trim();
 
+            let comparison = 0;
+
             // Tri alphabétique par titre.
             if (selectedSort === "title") {
-                return titleA.localeCompare(
+                comparison = titleA.localeCompare(
                     titleB,
                     "fr",
                     { sensitivity: "base" }
                 );
             }
 
-            // Tri par note TMDB décroissante.
-            if (selectedSort === "rating") {
+            // Tri par note TMDB.
+            else if (selectedSort === "rating") {
                 const ratingA = Number.parseFloat(
                     a.dataset.rating || "0"
                 );
@@ -77,32 +88,48 @@
                     b.dataset.rating || "0"
                 );
 
-                return ratingB - ratingA ||
-                    titleA.localeCompare(titleB, "fr");
+                comparison = ratingA - ratingB;
+
+                // Départage les notes identiques par titre.
+                if (comparison === 0) {
+                    comparison = titleA.localeCompare(
+                        titleB,
+                        "fr",
+                        { sensitivity: "base" }
+                    );
+                }
             }
 
-            // Tri par statut, puis par titre.
-            if (selectedSort === "status") {
+            // Tri par statut de visionnage.
+            else if (selectedSort === "status") {
                 const statusA =
                     statusOrder[a.dataset.status] ?? 99;
 
                 const statusB =
                     statusOrder[b.dataset.status] ?? 99;
 
-                return statusA - statusB ||
-                    titleA.localeCompare(titleB, "fr");
+                comparison = statusA - statusB;
+
+                // Départage les statuts identiques par titre.
+                if (comparison === 0) {
+                    comparison = titleA.localeCompare(
+                        titleB,
+                        "fr",
+                        { sensitivity: "base" }
+                    );
+                }
             }
 
-            return 0;
+            return comparison * direction;
         });
 
-        // Réinsère les cartes dans l'ordre calculé.
+        // Réorganise les cartes sans recharger la page.
         cards.forEach(card => {
             movieGrid.appendChild(card);
         });
     }
 
-    // Affiche les films correspondant au filtre de statut.
+    // Filtre les films selon le statut sélectionné.
     function filterMovies() {
         if (!statusSelect) {
             return;
@@ -119,7 +146,7 @@
         });
     }
 
-    // Événement de changement du tri.
+    // Changement du critère de tri.
     if (sortSelect) {
         sortSelect.addEventListener("change", () => {
             sortMovies();
@@ -127,15 +154,23 @@
         });
     }
 
-    // Événement de changement du filtre.
+    // Changement du sens du tri.
+    if (sortDirectionSelect) {
+        sortDirectionSelect.addEventListener("change", () => {
+            sortMovies();
+            filterMovies();
+        });
+    }
+
+    // Changement du filtre.
     if (statusSelect) {
         statusSelect.addEventListener("change", filterMovies);
     }
 
 
-    // ======================
+    // =====================================================
     // MESSAGES DE LA MODALE
-    // ======================
+    // =====================================================
 
     function showModalMessage(message, type = "success") {
         const messageElement = document.getElementById(
@@ -156,9 +191,9 @@
     }
 
 
-    // =========================
+    // =====================================================
     // OUVERTURE DE LA MODALE
-    // =========================
+    // =====================================================
 
     function openMovieModal(card) {
         if (!modal || !card) {
@@ -173,13 +208,14 @@
         const poster = card.dataset.poster || "";
         const status = card.dataset.status || "notseen";
 
-        // Informations principales.
+        // Titre et synopsis.
         document.getElementById("movie-modal-title").textContent =
             title;
 
         document.getElementById("movie-modal-synopsis").textContent =
             synopsis || "Aucun synopsis disponible.";
 
+        // Note TMDB.
         const tmdbRating = Number.parseFloat(
             card.dataset.rating || "0"
         );
@@ -187,7 +223,7 @@
         document.getElementById("movie-modal-tmdb-rating").textContent =
             `${tmdbRating.toFixed(1)} / 10`;
 
-        // Statut de visionnage.
+        // Statut.
         document.getElementById("movie-modal-status").value =
             status === "inprogress"
                 ? "InProgress"
@@ -202,7 +238,7 @@
         document.getElementById("movie-modal-personal-note").value =
             card.dataset.personalNote || "";
 
-        // Affiche le poster ou le remplacement correspondant.
+        // Affiche ou masque le poster.
         const posterImage = document.getElementById(
             "movie-modal-poster"
         );
@@ -226,7 +262,7 @@
         modal.show();
     }
 
-    // Un clic sur une carte ouvre la modale.
+    // Ouvre la modale au clic sur une carte.
     movieGrid.addEventListener("click", event => {
         const card = event.target.closest(".movie-item");
 
@@ -235,7 +271,7 @@
         }
     });
 
-    // L'ouverture est également possible au clavier.
+    // Permet aussi d'ouvrir une carte au clavier.
     movieGrid.addEventListener("keydown", event => {
         const card = event.target.closest(".movie-item");
 
@@ -249,9 +285,9 @@
     });
 
 
-    // ==========================
-    // ENVOI DES REQUÊTES POST
-    // ==========================
+    // =====================================================
+    // REQUÊTES POST AVEC PROTECTION ANTIFORGERY
+    // =====================================================
 
     async function postForm(url, values) {
         const token = document.querySelector(
@@ -285,9 +321,9 @@
     }
 
 
-    // ==============================
-    // NOTE PERSONNELLE SUR LA CARTE
-    // ==============================
+    // =====================================================
+    // AFFICHAGE DE LA NOTE PERSONNELLE
+    // =====================================================
 
     function updatePersonalRatingDisplay(card, rating) {
         const movieInfo = card.querySelector(".movie-info");
@@ -302,7 +338,7 @@
 
         const personalRating = Number(rating);
 
-        // Aucun élément à afficher si le film n'a pas de note.
+        // Si la note vaut zéro, la ligne n'est pas affichée.
         if (personalRating <= 0) {
             if (ratingLine) {
                 ratingLine.remove();
@@ -311,7 +347,7 @@
             return;
         }
 
-        // Crée la ligne lors de la première note attribuée.
+        // Crée la ligne si c'est la première note du film.
         if (!ratingLine) {
             ratingLine = document.createElement("p");
             ratingLine.className = "movie-personal-rating";
@@ -319,7 +355,6 @@
             movieInfo.appendChild(ratingLine);
         }
 
-        // Met à jour le libellé et la valeur.
         ratingLine.replaceChildren(
             document.createTextNode("Note personnelle : ")
         );
@@ -327,7 +362,7 @@
         const ratingValue = document.createElement("span");
 
         ratingValue.textContent =
-            `${personalRating.toLocaleString("fr-FR", {
+            `${personalRating.toLocaleString("fr-CH", {
                 minimumFractionDigits: 1,
                 maximumFractionDigits: 1
             })} / 10`;
@@ -336,9 +371,9 @@
     }
 
 
-    // =======================================
+    // =====================================================
     // ENREGISTREMENT DU STATUT ET DES NOTES
-    // =======================================
+    // =====================================================
 
     document.getElementById("movie-modal-save")
         .addEventListener("click", async () => {
@@ -390,24 +425,23 @@
                 selectedCard.dataset.personalNote =
                     result.personalNote || "";
 
-                // Actualise le statut visible.
+                // Met à jour le statut visible.
                 const statusLabel = selectedCard.querySelector(
                     ".movie-status-label"
                 );
 
                 if (statusLabel) {
                     statusLabel.textContent =
-                        statusLabels[result.status] ||
-                        result.status;
+                        statusLabels[result.status] || result.status;
                 }
 
-                // Actualise ou retire la note personnelle.
+                // Met à jour la note personnelle.
                 updatePersonalRatingDisplay(
                     selectedCard,
                     result.personalRating
                 );
 
-                // Réapplique le tri et le filtre.
+                // Réapplique le tri et le filtre actifs.
                 sortMovies();
                 filterMovies();
 
@@ -420,9 +454,9 @@
         });
 
 
-    // =====================
+    // =====================================================
     // SUPPRESSION DU FILM
-    // =====================
+    // =====================================================
 
     document.getElementById("movie-modal-delete")
         .addEventListener("click", async () => {
@@ -432,7 +466,7 @@
 
             const title = selectedCard.dataset.title || "ce film";
 
-            // Confirmation avant suppression.
+            // Confirmation avant la suppression.
             if (!window.confirm(
                 `Voulez-vous vraiment supprimer « ${title} » de votre bibliothèque ?`
             )) {
@@ -459,19 +493,19 @@
                     );
                 }
 
-                // Retire la carte de la grille.
+                // Supprime la carte de la grille.
                 selectedCard.remove();
                 selectedCard = null;
 
                 const remainingMovies = getMovieCards().length;
 
-                // Met à jour le compteur de films.
+                // Actualise le compteur.
                 if (movieCount) {
                     movieCount.textContent =
                         `${remainingMovies} film${remainingMovies > 1 ? "s" : ""}`;
                 }
 
-                // Affiche l'état vide si nécessaire.
+                // Affiche l'état vide s'il ne reste aucun film.
                 if (remainingMovies === 0) {
                     movieGrid.classList.add("d-none");
 
@@ -480,11 +514,11 @@
                     }
                 }
 
-                // Applique de nouveau le tri et le filtre.
+                // Réapplique le tri et le filtre.
                 sortMovies();
                 filterMovies();
 
-                // Ferme la modale après la suppression.
+                // Ferme la modale.
                 if (modal) {
                     modal.hide();
                 }
@@ -496,9 +530,9 @@
         });
 
 
-    // ===================
+    // =====================================================
     // INITIALISATION
-    // ===================
+    // =====================================================
 
     sortMovies();
     filterMovies();

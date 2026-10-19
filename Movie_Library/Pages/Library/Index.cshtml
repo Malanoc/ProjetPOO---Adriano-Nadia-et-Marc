@@ -33,19 +33,33 @@
         <div class="library-toolbar">
             <div class="row g-3 align-items-end">
 
-                <div class="col-12 col-md-6">
+                <!-- Critère de tri -->
+                <div class="col-12 col-md-4">
                     <label for="sort" class="form-label">
                         Trier par
                     </label>
 
                     <select id="sort" class="form-select">
                         <option value="title">Titre</option>
-                        <option value="rating">Note</option>
+                        <option value="rating">Note TMDB</option>
                         <option value="status">Statut</option>
                     </select>
                 </div>
 
-                <div class="col-12 col-md-6">
+                <!-- Sens du tri -->
+                <div class="col-12 col-md-4">
+                    <label for="sort-direction" class="form-label">
+                        Ordre
+                    </label>
+
+                    <select id="sort-direction" class="form-select">
+                        <option value="asc">Croissant</option>
+                        <option value="desc">Décroissant</option>
+                    </select>
+                </div>
+
+                <!-- Filtre par statut -->
+                <div class="col-12 col-md-4">
                     <label for="status" class="form-label">
                         Filtrer
                     </label>
@@ -62,9 +76,7 @@
         </div>
 
 
-        <!-- ÉTAT VIDE
-             Toujours présent dans le DOM pour permettre
-             de l'afficher après la suppression du dernier film. -->
+        <!-- ÉTAT VIDE -->
         <div id="library-empty-state"
              class="library-empty @(Model.Library.Movies.Count > 0 ? "d-none" : "")">
 
@@ -122,7 +134,7 @@
                             }
                         </div>
 
-                        <!-- INFORMATIONS PRINCIPALES -->
+                        <!-- INFORMATIONS DU FILM -->
                         <div class="movie-info">
 
                             <h2 class="movie-title">
@@ -132,7 +144,13 @@
                             <!-- Statut et note TMDB -->
                             <div class="movie-meta">
                                 <span class="movie-status-label">
-                                    @movie.Status
+                                    @(
+                                        movie.Status == Movie_Library.Classes.Status.NotSeen
+                                            ? "Non vu"
+                                            : movie.Status == Movie_Library.Classes.Status.InProgress
+                                                ? "En cours"
+                                                : "Vu"
+                                    )
                                 </span>
 
                                 @if (movie.RatingTMDB > 0)
@@ -143,11 +161,11 @@
                                 }
                             </div>
 
-                            <!-- Note personnelle : affichée uniquement si une note existe -->
+                            <!-- Note personnelle, si elle existe -->
                             @if (movie.PersonalRating > 0)
                             {
                                 <p class="movie-personal-rating">
-                                    Note personnelle :
+                                    <span>Note personnelle :</span>
                                     <span>
                                         @movie.PersonalRating.ToString("0.0") / 10
                                     </span>
@@ -182,15 +200,14 @@
 
         <div class="modal-content movie-modal-content">
 
-            <!-- EN-TÊTE DE LA MODALE -->
+            <!-- EN-TÊTE -->
             <div class="modal-header">
                 <div>
                     <span class="home-kicker">
                         Gestion du film
                     </span>
 
-                    <h2 class="modal-title h3" id="movie-modal-title">
-                    </h2>
+                    <h2 class="modal-title h3" id="movie-modal-title"></h2>
                 </div>
 
                 <button type="button"
@@ -204,20 +221,18 @@
             <!-- CONTENU -->
             <div class="modal-body">
 
-                <!-- MESSAGE DE CONFIRMATION OU D'ERREUR -->
                 <div id="movie-modal-message"
                      class="alert d-none"
                      role="status"
                      aria-live="polite">
                 </div>
 
-                <!-- JETON DE PROTECTION DES FORMULAIRES -->
+                <!-- Protection antiforgery -->
                 @Html.AntiForgeryToken()
 
-
-                <!-- AFFICHE ET DÉTAILS -->
                 <div class="row g-4">
 
+                    <!-- AFFICHE -->
                     <div class="col-12 col-sm-4">
                         <div class="movie-poster">
 
@@ -235,9 +250,9 @@
                     </div>
 
 
+                    <!-- INFORMATIONS -->
                     <div class="col-12 col-sm-8">
 
-                        <!-- NOTE TMDB -->
                         <div class="movie-modal-rating mb-3">
                             <span class="movie-rating">
                                 Note TMDB
@@ -245,7 +260,6 @@
 
                             <strong id="movie-modal-tmdb-rating"></strong>
                         </div>
-
 
                         <!-- STATUT -->
                         <h3 class="h5">
@@ -255,20 +269,11 @@
                         <select id="movie-modal-status"
                                 class="form-select mb-4">
 
-                            <option value="NotSeen">
-                                Non vu
-                            </option>
-
-                            <option value="InProgress">
-                                En cours
-                            </option>
-
-                            <option value="Seen">
-                                Vu
-                            </option>
+                            <option value="NotSeen">Non vu</option>
+                            <option value="InProgress">En cours</option>
+                            <option value="Seen">Vu</option>
 
                         </select>
-
 
                         <!-- SYNOPSIS -->
                         <h3 class="h5">
@@ -281,9 +286,7 @@
 
                 </div>
 
-
                 <hr class="my-4" />
-
 
                 <!-- NOTE PERSONNELLE -->
                 <div class="mb-3">
@@ -300,7 +303,6 @@
                            step="0.5"
                            value="0" />
                 </div>
-
 
                 <!-- COMMENTAIRE PERSONNEL -->
                 <div class="mb-3">
