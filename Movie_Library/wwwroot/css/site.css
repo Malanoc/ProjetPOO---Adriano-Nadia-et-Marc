@@ -588,3 +588,86 @@ a {
         margin-top: 1rem;
     }
 }
+/* =========================================================
+   MODALE DE GESTION D'UN FILM
+   ========================================================= */
+
+.movie-item {
+    cursor: pointer;
+}
+
+    .movie-item:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 5px;
+    }
+
+.movie-modal-content {
+    color: var(--text);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+    .movie-modal-content .modal-header,
+    .movie-modal-content .modal-footer {
+        border-color: var(--border);
+    }
+
+    .movie-modal-content .modal-title {
+        color: var(--text);
+    }
+
+    .movie-modal-content .btn-close {
+        filter: invert(1);
+    }
+
+    .movie-modal-content .form-label {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+.movie-modal-rating {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+    .movie-modal-rating strong {
+        color: var(--gold);
+    }
+
+.movie-modal-content .form-control,
+.movie-modal-content .form-select {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+    .movie-modal-content .form-control:focus,
+    .movie-modal-content .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.2rem rgba(201, 75, 60, 0.2);
+    }
+
+.movie-modal-content .modal-body hr {
+    border-color: var(--border);
+    opacity: 1;
+}
+
+@media (max-width: 575px) {
+    .movie-modal-content .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .movie-modal-content .modal-body {
+        padding: 1rem;
+    }
+
+    .movie-modal-content .modal-footer {
+        flex-wrap: wrap;
+    }
+
+        .movie-modal-content .modal-footer > * {
+            margin: 0;
+        }
+}
