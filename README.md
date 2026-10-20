@@ -181,3 +181,8 @@ Contient les fichiers statiques utilisés par l'interface :
 
 Contient les fichiers de configuration liés au lancement de l'application, notamment `launchSettings.json`.
 
+## Démarrer le projet
+
+1. Installer le SDK .NET 8.0 depuis le site officiel : https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.424-windows-x64-installer
+2. Ouvrir le projet dans Visual Studio
+3. cliquer sur le bouton "Run" dans le fichier program.cs pour lancer l'application.
