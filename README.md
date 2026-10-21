@@ -185,4 +185,5 @@ Contient les fichiers de configuration liés au lancement de l'application, nota
 
 1. Installer le SDK .NET 8.0 depuis le site officiel : https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/sdk-8.0.424-windows-x64-installer
 2. Ouvrir le projet dans Visual Studio
-3. cliquer sur le bouton "Run" dans le fichier program.cs pour lancer l'application.
+3. Ouvrez le terminal
+4. taper `dotnet run` pour lancer le projet
