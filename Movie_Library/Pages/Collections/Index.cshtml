@@ -132,27 +132,105 @@
         }
         else
         {
-            <div class="row g-4">
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 movie-grid">
 
                 @foreach (var collection in Model.Library.Collections)
                 {
-                    <div class="col-12 col-md-6 col-lg-4">
+                    <!--
+                        movie-item permet de récupérer l'animation
+                        de déplacement vers le haut.
+                    -->
+                    <div class="col movie-item">
+            
+                        <a asp-page="/Collections/Details"
+                           asp-route-name="@collection.Name"
+                           class="text-decoration-none text-reset d-block h-100">
+            
+            
+                            <!--
+                                movie-card permet notamment d'obtenir
+                                l'effet de zoom sur le poster.
+                            -->
+                            <article class="movie-card">
+            
+            
+                                <!-- POSTER -->
+                                <div class="movie-poster">
+            
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        collection.Poster))
+                                    {
+                                        <img src="@collection.Poster"
+                                             alt="Poster de @collection.Name"
+                                             loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="movie-poster-placeholder">
+            
+                                            Pas de poster
+            
+                                        </div>
+                                    }
+            
+                                </div>
+            
+            
+                                <!-- INFORMATIONS -->
+                                <div class="movie-info">
+            
+                                    <h3 class="movie-title">
+                                        @collection.Name
+                                    </h3>
+            
+                                    <div class="movie-meta">
+            
+                                        <span class="movie-status-label">
+            
+                                            @collection.Movies.Count film(s)
+            
+                                        </span>
+            
+                                    </div>
+            
+                                </div>
+            
+                            </article>
+            
+                        </a>
 
-                        <article class="movie-card p-4 h-100">
-
-                            <h3 class="h5">
-                                @collection.Name
-                            </h3>
-
-                            <p class="mb-0">
-                                @collection.Movies.Count film(s)
-                            </p>
-
-                        </article>
-
+                        <!-- =================================================
+                             SUPPRESSION DE LA COLLECTION
+                             ================================================= -->
+                        
+                        <form method="post"
+                              asp-page-handler="Delete"
+                              class="mt-2"
+                              onsubmit="return confirm(
+                                  'Voulez-vous vraiment supprimer la collection « @collection.Name » ?'
+                              );">
+                        
+                            <!--
+                                Envoie le nom de la collection
+                                au handler OnPostDelete.
+                            -->
+                            <input type="hidden"
+                                   name="collectionName"
+                                   value="@collection.Name" />
+                        
+                        
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm w-100">
+                        
+                                Supprimer la collection
+                        
+                            </button>
+                        
+                        </form>
+            
                     </div>
                 }
-
+            
             </div>
         }
 

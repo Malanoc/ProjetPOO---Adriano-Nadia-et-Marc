@@ -465,13 +465,34 @@
             }
 
             const title = selectedCard.dataset.title || "ce film";
-
+            
+            /*
+             * La page peut préciser l'endroit
+             * depuis lequel le film est supprimé.
+             *
+             * Sur la bibliothèque :
+             *
+             *     "votre bibliothèque"
+             *
+             * Sur une collection :
+             *
+             *     "cette collection"
+             *
+             * Si aucun data-delete-target n'est défini,
+             * on considère qu'il s'agit de la bibliothèque.
+             */
+            const deleteTarget =
+                movieModalElement.dataset.deleteTarget
+                || "votre bibliothèque";
+            
+            
             // Confirmation avant la suppression.
             if (!window.confirm(
-                `Voulez-vous vraiment supprimer « ${title} » de votre bibliothèque ?`
+                `Voulez-vous vraiment supprimer « ${title} » de ${deleteTarget} ?`
             )) {
                 return;
             }
+
 
             const deleteButton = document.getElementById(
                 "movie-modal-delete"
@@ -491,6 +512,22 @@
                     throw new Error(
                         result.message || "La suppression a échoué."
                     );
+                }
+
+                /*
+                 * Certaines pages ont besoin d'être rechargées
+                 * après la suppression.
+                 *
+                 * C'est le cas d'une collection :
+                 * lorsqu'on retire un film, celui-ci doit
+                 * immédiatement réapparaître dans la liste
+                 * "Ajouter des films".
+                 */
+                if (
+                    movieModalElement.dataset.deleteReload === "true"
+                ) {
+                    window.location.reload();
+                    return;
                 }
 
                 // Supprime la carte de la grille.

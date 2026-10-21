@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 // Alias pour éviter les confusions entre
 // le namespace Pages.Collections et la classe Collection.
@@ -117,6 +118,30 @@ namespace Movie_Library.Pages.Collections
                 return Page();
             }
 
+            /*
+             * Vérifie qu'une collection avec le même nom
+             * n'existe pas déjà.
+             */
+            bool collectionAlreadyExists =
+                Library.Collections.Any(
+                    collection =>
+                        string.Equals(
+                            collection.Name,
+                            collectionName,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                );
+
+
+            if (collectionAlreadyExists)
+            {
+                ModelState.AddModelError(
+                    nameof(CollectionName),
+                    "Une collection avec ce nom existe déjà."
+                );
+
+                return Page();
+            }
 
             /*
              * Création de la collection.
@@ -151,6 +176,66 @@ namespace Movie_Library.Pages.Collections
              *
              * Cela évite qu'un rafraîchissement du navigateur
              * renvoie le formulaire une deuxième fois.
+             */
+            return RedirectToPage();
+        }
+
+        /// <summary>
+        /// Supprime une collection de la bibliothèque.
+        ///
+        /// Les films contenus dans la collection ne sont PAS
+        /// supprimés de la bibliothèque.
+        ///
+        /// Seule la collection est supprimée.
+        /// </summary>
+        public IActionResult OnPostDelete(
+            [FromForm] string collectionName)
+        {
+            /*
+             * Recherche la collection grâce à son nom.
+             *
+             * Le nom étant unique, il permet d'identifier
+             * la collection à supprimer.
+             */
+            CollectionClass? collection =
+                Library.Collections.FirstOrDefault(
+                    existingCollection =>
+                        string.Equals(
+                            existingCollection.Name,
+                            collectionName,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                );
+
+
+            /*
+             * Si la collection n'existe plus,
+             * on affiche simplement un message.
+             */
+            if (collection == null)
+            {
+                Message =
+                    "Cette collection n'existe plus.";
+
+                return RedirectToPage();
+            }
+
+
+            /*
+             * Suppression de la collection.
+             *
+             * Cette opération ne supprime PAS les films
+             * de MongoDB ou de la bibliothèque.
+             */
+            Library.removeCollection(collection);
+
+
+            Message =
+                $"La collection « {collection.Name} » a été supprimée.";
+
+
+            /*
+             * Retour vers la page des collections.
              */
             return RedirectToPage();
         }

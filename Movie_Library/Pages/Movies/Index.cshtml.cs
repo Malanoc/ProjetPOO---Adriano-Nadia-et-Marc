@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Movie_Library.Classes;
 using Movie_Library.Classes.Tmdb;
 using Movie_Library.Data;
+using System.Globalization;
 using LibraryClass = Movie_Library.Classes.Library;
 
 namespace Movie_Library.Pages.Movies
@@ -49,12 +50,39 @@ namespace Movie_Library.Pages.Movies
             string title,
             string synopsis,
             string poster,
-            float ratingTMDB,
+            string ratingTMDB,
             string? searchTerm)
         {
             SearchTerm = searchTerm;
 
             await LoadLibraryAsync();
+
+            /*
+             * La note TMDB est envoyée par JavaScript avec un point
+             * comme séparateur décimal.
+             *
+             * Exemple :
+             *
+             * "7.8"
+             *
+             * On utilise donc InvariantCulture pour garantir
+             * que le point soit correctement interprété.
+             */
+            float parsedRatingTMDB = 0;
+
+            bool ratingIsValid =
+                float.TryParse(
+                    ratingTMDB,
+                    NumberStyles.Float,
+                    CultureInfo.InvariantCulture,
+                    out parsedRatingTMDB
+                );
+
+
+            if (!ratingIsValid)
+            {
+                parsedRatingTMDB = 0;
+            }
 
             Movie movie =
                 new Movie(
@@ -62,7 +90,7 @@ namespace Movie_Library.Pages.Movies
                     title,
                     synopsis,
                     poster,
-                    ratingTMDB,
+                    parsedRatingTMDB,
                     Status.NotSeen
                 );
 

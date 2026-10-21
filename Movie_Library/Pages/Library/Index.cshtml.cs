@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Movie_Library.Classes;
 using Movie_Library.Data;
+using System.Linq;
 using LibraryClass = Movie_Library.Classes.Library;
 
 namespace Movie_Library.Pages.Library
@@ -9,6 +10,14 @@ namespace Movie_Library.Pages.Library
     public class IndexModel : PageModel
     {
         private readonly MongoDbService _mongoDbService;
+
+        /// <summary>
+        /// Bibliothèque partagée de l'application.
+        ///
+        /// Cette instance correspond au singleton déclaré dans Program.cs.
+        /// Elle contient notamment les collections créées par l'utilisateur.
+        /// </summary>
+        private readonly LibraryClass _sharedLibrary;
 
         /// <summary>
         /// Bibliothèque affichée dans la page.
@@ -19,10 +28,31 @@ namespace Movie_Library.Pages.Library
         /// Initialise le modèle de la page.
         /// MongoDbService est injecté par ASP.NET Core.
         /// </summary>
-        public IndexModel(MongoDbService mongoDbService)
+        public IndexModel(MongoDbService mongoDbService, LibraryClass sharedLibrary)
         {
+            /*
+             * Service utilisé pour lire et modifier les films
+             * enregistrés dans MongoDB.
+             */
             _mongoDbService = mongoDbService;
-            Library = new LibraryClass("Ma bibliothèque");
+
+
+            /*
+             * Bibliothèque singleton partagée dans toute l'application.
+             *
+             * C'est ici que sont actuellement stockées
+             * les collections.
+             */
+            _sharedLibrary = sharedLibrary;
+
+
+            /*
+             * Cette bibliothèque reste utilisée uniquement
+             * pour afficher les films récupérés depuis MongoDB
+             * sur cette page.
+             */
+            Library =
+                new LibraryClass("Ma bibliothèque");
         }
 
         /// <summary>
@@ -104,20 +134,67 @@ namespace Movie_Library.Pages.Library
 
         /// <summary>
         /// Supprime un film de la bibliothèque.
-        /// Handler appelé par POST avec le nom Delete.
+        ///
+        /// Lorsqu'un film est supprimé de la bibliothèque,
+        /// il est également retiré automatiquement
+        /// de toutes les collections qui le contiennent.
         /// </summary>
         public async Task<IActionResult> OnPostDeleteAsync(
             [FromForm] int id)
         {
+            /*
+             * Suppression du film dans MongoDB.
+             *
+             * MongoDB représente actuellement la source principale
+             * des films présents dans la bibliothèque.
+             */
             bool deleted =
                 await _mongoDbService.DeleteMovieAsync(id);
+
+
+            /*
+             * Si le film a bien été supprimé de la bibliothèque,
+             * on doit également le retirer de toutes les collections.
+             */
+            if (deleted)
+            {
+                /*
+                 * Parcourt toutes les collections.
+                 */
+                foreach (var collection in _sharedLibrary.Collections)
+                {
+                    /*
+                     * Recherche dans cette collection le film
+                     * possédant le même identifiant TMDB.
+                     */
+                    Movie? movieInCollection =
+                        collection.Movies.FirstOrDefault(
+                            movie =>
+                                movie.Id == id
+                        );
+
+
+                    /*
+                     * Si le film est présent dans cette collection,
+                     * on le retire.
+                     */
+                    if (movieInCollection != null)
+                    {
+                        collection.RemoveMovie(
+                            movieInCollection
+                        );
+                    }
+                }
+            }
+
 
             return new JsonResult(new
             {
                 success = deleted,
                 id,
+
                 message = deleted
-                    ? "Le film a été supprimé de votre bibliothèque."
+                    ? "Le film a été supprimé de votre bibliothèque et de vos collections."
                     : "Ce film n'existe plus dans la bibliothèque."
             });
         }
