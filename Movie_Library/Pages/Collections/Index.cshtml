@@ -1,4 +1,167 @@
 ﻿@page
 @model Movie_Library.Pages.Collections.IndexModel
+
 @{
+    ViewData["Title"] = "Collections";
+}
+
+
+<div class="container py-5">
+
+    <!-- =====================================================
+         EN-TÊTE
+         ===================================================== -->
+
+    <header class="mb-5">
+
+        <span class="home-kicker">
+            Bibliothèque
+        </span>
+
+        <h1 class="display-5 fw-bold">
+            Mes collections
+        </h1>
+
+        <p>
+            Créez des collections pour organiser vos films.
+        </p>
+
+    </header>
+
+
+    <!-- =====================================================
+         MESSAGE DE CONFIRMATION
+         ===================================================== -->
+
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <div class="alert alert-success mb-4"
+             role="status">
+
+            @Model.Message
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         FORMULAIRE DE CRÉATION
+         ===================================================== -->
+
+    <section class="mb-5">
+
+        <h2 class="h4 mb-3">
+            Créer une collection
+        </h2>
+
+
+        <form method="post"
+              asp-page-handler="Create">
+
+            <div class="row g-2">
+
+                <!-- NOM DE LA COLLECTION -->
+                <div class="col">
+
+                    <label asp-for="CollectionName"
+                           class="form-label">
+                        Nom de la collection
+                    </label>
+
+                    <input asp-for="CollectionName"
+                           class="form-control"
+                           placeholder="Ex. Science-fiction, Marvel, Films préférés..."
+                           autocomplete="off" />
+
+                    <!--
+                        Affiche automatiquement le message
+                        défini par [Required] lorsque le champ
+                        n'est pas correctement rempli.
+                    -->
+                    <span asp-validation-for="CollectionName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- BOUTON -->
+                <div class="col-auto align-self-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Créer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =====================================================
+         COLLECTIONS EXISTANTES
+         ===================================================== -->
+
+    <section>
+
+        <h2 class="h4 mb-4">
+            Collections créées
+        </h2>
+
+
+        @if (Model.Library.Collections.Count == 0)
+        {
+            <div class="library-empty">
+
+                <h3 class="h5">
+                    Aucune collection
+                </h3>
+
+                <p>
+                    Créez votre première collection à l'aide
+                    du formulaire ci-dessus.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+
+                @foreach (var collection in Model.Library.Collections)
+                {
+                    <div class="col-12 col-md-6 col-lg-4">
+
+                        <article class="movie-card p-4 h-100">
+
+                            <h3 class="h5">
+                                @collection.Name
+                            </h3>
+
+                            <p class="mb-0">
+                                @collection.Movies.Count film(s)
+                            </p>
+
+                        </article>
+
+                    </div>
+                }
+
+            </div>
+        }
+
+    </section>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
 }
