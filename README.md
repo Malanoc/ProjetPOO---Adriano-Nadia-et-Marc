@@ -62,6 +62,10 @@ Movie_Library/
 ├── Services/
 │   └── MoviesApi.cs
 │
+├── Repositories/
+│   ├── MovieRepository.cs
+│   └── CollectionRepository.cs
+│
 ├── Data/
 │   └── MongoDbService.cs
 │
@@ -86,10 +90,10 @@ Movie_Library/
 │   │
 │   ├── Collections/
 │   │   ├── Index.cshtml
-│   │   ├── Create.cshtml
-│   │   ├── Create.cshtml.cs
+│   │   ├── Index.cshtml.cs
 │   │   ├── Details.cshtml
 │   │   └── Details.cshtml.cs
+│   │  
 │   │
 │   ├── Index.cshtml
 │   ├── Index.cshtml.cs
