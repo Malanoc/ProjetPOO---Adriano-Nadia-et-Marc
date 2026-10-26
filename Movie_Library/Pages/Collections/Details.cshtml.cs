@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Movie_Library.Data;
+using Movie_Library.Repositories;
 using System.Threading.Tasks;
 
 // Alias pour éviter les conflits avec
@@ -24,7 +24,8 @@ namespace Movie_Library.Pages.Collections
     /// </summary>
     public class DetailsModel : PageModel
     {
-        private readonly MongoDbService _mongoDbService;
+        private readonly MovieRepository _movieRepository;
+        private readonly CollectionRepository _collectionRepository;
 
         /// <summary>
         /// Bibliothèque principale de l'application.
@@ -134,10 +135,11 @@ namespace Movie_Library.Pages.Collections
         /// <summary>
         /// Constructeur de la page.
         /// </summary>
-        public DetailsModel(LibraryClass library, MongoDbService mongoDbService)
+        public DetailsModel(LibraryClass library,MovieRepository movieRepository,CollectionRepository collectionRepository)
         {
             Library = library;
-            _mongoDbService = mongoDbService;
+            _movieRepository = movieRepository;
+            _collectionRepository = collectionRepository;
         }
 
 
@@ -193,7 +195,7 @@ namespace Movie_Library.Pages.Collections
         private async Task LoadLibraryMoviesAsync()
         {
             LibraryMovies =
-                await _mongoDbService.GetMoviesAsync();
+                await _movieRepository.GetAllAsync();
         }
 
         /// <summary>
@@ -331,6 +333,8 @@ namespace Movie_Library.Pages.Collections
                 return Page();
             }
 
+            // Ajout de la sauvegarde, s'execute uniquement si au moins un film a été ajouté.
+            await _collectionRepository.SaveAsync(CurrentCollection!);
 
             /*
              * Message de confirmation.
@@ -372,7 +376,7 @@ namespace Movie_Library.Pages.Collections
         /// Seule l'association entre le film et la collection
         /// est supprimée.
         /// </summary>
-        public IActionResult OnPostRemoveMovie(
+        public async Task <IActionResult> OnPostRemoveMovieAsync(
             [FromRoute] string name,
             [FromForm] int id)
         {
@@ -443,6 +447,7 @@ namespace Movie_Library.Pages.Collections
              * Le film reste donc dans la bibliothèque.
              */
             collection.RemoveMovie(movie);
+            await _collectionRepository.SaveAsync(collection);
 
 
             return new JsonResult(new
@@ -566,7 +571,9 @@ namespace Movie_Library.Pages.Collections
                 EditCollectionPoster?.Trim()
                 ?? string.Empty;
 
-
+            // Supprime l'ancient document puis sauvegarde la collection renommée.
+            await _collectionRepository.DeleteAsync(OriginalCollectionName);
+            await _collectionRepository.SaveAsync(CurrentCollection);
             /*
              * Message affiché après redirection.
              */

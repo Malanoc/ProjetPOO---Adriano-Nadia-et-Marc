@@ -1,3 +1,6 @@
+using Movie_Library.Repositories;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +19,9 @@ namespace Movie_Library.Pages.Collections
     /// </summary>
     public class IndexModel : PageModel
     {
+        private readonly CollectionRepository _collectionRepository;
+
+
         /// <summary>
         /// Bibliothèque principale de l'application.
         ///
@@ -54,9 +60,10 @@ namespace Movie_Library.Pages.Collections
         /// ASP.NET Core fournit automatiquement
         /// la Library enregistrée dans Program.cs.
         /// </summary>
-        public IndexModel(LibraryClass library)
+        public IndexModel(LibraryClass library, CollectionRepository collectionRepository)
         {
             Library = library;
+            _collectionRepository = collectionRepository;
         }
 
 
@@ -72,7 +79,7 @@ namespace Movie_Library.Pages.Collections
         /// Traite le formulaire de création
         /// d'une nouvelle collection.
         /// </summary>
-        public IActionResult OnPostCreate()
+        public async Task<IActionResult> OnPostCreateAsync()
         {
             /*
              * Vérifie les règles de validation.
@@ -163,6 +170,9 @@ namespace Movie_Library.Pages.Collections
              */
             Library.addCollection(collection);
 
+            // Enregistre aussi la collection dans MongoDB.
+            await _collectionRepository.SaveAsync(collection);
+
 
             /*
              * Prépare le message de confirmation.
@@ -188,7 +198,7 @@ namespace Movie_Library.Pages.Collections
         ///
         /// Seule la collection est supprimée.
         /// </summary>
-        public IActionResult OnPostDelete(
+        public async Task<IActionResult> OnPostDeleteAsync(
             [FromForm] string collectionName)
         {
             /*
@@ -227,6 +237,8 @@ namespace Movie_Library.Pages.Collections
              * Cette opération ne supprime PAS les films
              * de MongoDB ou de la bibliothèque.
              */
+
+            await _collectionRepository.DeleteAsync(collection.Name);
             Library.removeCollection(collection);
 
 

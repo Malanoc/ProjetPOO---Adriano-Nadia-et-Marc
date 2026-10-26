@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Movie_Library.Classes;
-using Movie_Library.Data;
+using Movie_Library.Repositories;
 using System.Linq;
 using LibraryClass = Movie_Library.Classes.Library;
 
@@ -9,7 +9,19 @@ namespace Movie_Library.Pages.Library
 {
     public class IndexModel : PageModel
     {
-        private readonly MongoDbService _mongoDbService;
+        /// <summary>
+        /// Repository responsable de la gestion des collections.
+        /// Il permet d'accéder aux collections sans appeler
+        /// directement le service de base de données.
+        /// </summary>
+        private readonly CollectionRepository _collectionRepository;
+        /// <summary>
+        /// Repository responsable de la gestion des films.
+        /// Il permet d'accéder aux données des films dans MongoDB
+        /// sans appeler directement le service de base de données.
+        /// </summary>
+        /// 
+        private readonly MovieRepository _movieRepository;
 
         /// <summary>
         /// Bibliothèque partagée de l'application.
@@ -26,17 +38,14 @@ namespace Movie_Library.Pages.Library
 
         /// <summary>
         /// Initialise le modèle de la page.
-        /// MongoDbService est injecté par ASP.NET Core.
+        /// Les repositories et la bibliothèque partagée
+        /// sont injectés par ASP.NET Core.
         /// </summary>
-        public IndexModel(MongoDbService mongoDbService, LibraryClass sharedLibrary)
+        public IndexModel(MovieRepository movieRepository,CollectionRepository collectionRepository,LibraryClass sharedLibrary)
         {
-            /*
-             * Service utilisé pour lire et modifier les films
-             * enregistrés dans MongoDB.
-             */
-            _mongoDbService = mongoDbService;
+            _movieRepository = movieRepository;
 
-
+            _collectionRepository = collectionRepository;
             /*
              * Bibliothèque singleton partagée dans toute l'application.
              *
@@ -44,16 +53,14 @@ namespace Movie_Library.Pages.Library
              * les collections.
              */
             _sharedLibrary = sharedLibrary;
-
-
             /*
              * Cette bibliothèque reste utilisée uniquement
              * pour afficher les films récupérés depuis MongoDB
              * sur cette page.
              */
-            Library =
-                new LibraryClass("Ma bibliothèque");
+            Library = new LibraryClass("Ma bibliothèque");
         }
+        
 
         /// <summary>
         /// Charge les films depuis MongoDB à l'ouverture de la page.
@@ -69,7 +76,9 @@ namespace Movie_Library.Pages.Library
         private async Task LoadLibraryAsync()
         {
             List<Movie> movies =
-                await _mongoDbService.GetMoviesAsync();
+                await _movieRepository.GetAllAsync();
+
+            Library = new LibraryClass("Ma bibliothèque");
 
             foreach (Movie movie in movies)
             {
@@ -113,7 +122,7 @@ namespace Movie_Library.Pages.Library
 
             // Enregistre les modifications dans MongoDB.
             bool updated =
-                await _mongoDbService.UpdateMovieDetailsAsync(
+                await _movieRepository.UpdateDetailsAsync(
                     id,
                     parsedStatus,
                     personalRating,
@@ -149,7 +158,7 @@ namespace Movie_Library.Pages.Library
              * des films présents dans la bibliothèque.
              */
             bool deleted =
-                await _mongoDbService.DeleteMovieAsync(id);
+                await _movieRepository.DeleteAsync(id);
 
 
             /*
@@ -183,6 +192,9 @@ namespace Movie_Library.Pages.Library
                         collection.RemoveMovie(
                             movieInCollection
                         );
+
+                        // Sauvegarde la collection après sa modification dans MongoDB.
+                        await _collectionRepository.SaveAsync(collection);
                     }
                 }
             }

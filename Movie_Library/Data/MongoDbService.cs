@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Bson;
@@ -17,6 +18,9 @@ namespace Movie_Library.Data
     {
         private readonly IMongoDatabase _database;
         private readonly IMongoCollection<BsonDocument> _movies;
+       
+        // Accès aux collections personnelles enregistrées dans MongoDB.
+        private readonly IMongoCollection<BsonDocument> _collections;
 
         /// <summary>
         /// Initialise la connexion à MongoDB.
@@ -52,6 +56,8 @@ namespace Movie_Library.Data
             _database = client.GetDatabase(databaseName);
 
             _movies = _database.GetCollection<BsonDocument>("movies");
+
+            _collections = _database.GetCollection<BsonDocument>("collections");
         }
 
         /// <summary>
@@ -293,6 +299,111 @@ namespace Movie_Library.Data
                 .Eq("_id", tmdbId);
 
             var result = await _movies.DeleteOneAsync(filter);
+
+            return result.DeletedCount > 0;
+        }
+
+        /// <summary>
+        /// Enregistre une collection ou met à jour ses informations.
+        /// Les films sont identifiés par leur identifiant TMDB.
+        /// </summary>
+        public async Task SaveCollectionAsync(Collection collection)
+        {
+            var filter = Builders<BsonDocument>.Filter
+                .Eq("name", collection.Name);
+
+            var document = new BsonDocument
+    {
+        { "name", collection.Name },
+        { "poster", collection.Poster ?? string.Empty },
+        {
+            "movieIds",
+            new BsonArray(
+                collection.Movies.Select(movie => movie.Id)
+            )
+        }
+    };
+
+            await _collections.ReplaceOneAsync(
+                filter,
+                document,
+                new ReplaceOptions { IsUpsert = true }
+            );
+        }
+
+        /// <summary>
+        /// Récupère les collections enregistrées dans MongoDB.
+        /// </summary>
+        public async Task<List<BsonDocument>> GetCollectionsAsync()
+        {
+            return await _collections
+                .Find(FilterDefinition<BsonDocument>.Empty)
+                .ToListAsync();
+        }
+
+        /// <summary>
+        /// Récupère les collections enregistrées dans MongoDB
+        /// et reconstitue leurs listes de films.
+        /// </summary>
+        public async Task<List<Collection>> LoadCollectionsAsync()
+        {
+            // Récupère toutes les collections enregistrées dans MongoDB.
+            List<BsonDocument> documents = await GetCollectionsAsync();
+
+            // Récupère les films enregistrés dans la bibliothèque.
+            List<Movie> movies = await GetMoviesAsync();
+
+            // Prépare la liste des collections à reconstituer.
+            List<Collection> collections = new();
+
+            // Parcourt chaque document de collection récupéré.
+            foreach (BsonDocument document in documents)
+            {
+                // Récupère le nom de la collection.
+                string name = document.GetValue("name", "").AsString;
+
+                // Récupère son affiche.
+                string poster = document.GetValue("poster", "").AsString;
+
+                // Crée un nouvel objet Collection.
+                Collection collection = new Collection(name, poster);
+
+                // Vérifie si le document contient des identifiants de films.
+                if (document.Contains("movieIds"))
+                {
+                    // Parcourt les identifiants des films de cette collection.
+                    foreach (BsonValue movieId in document["movieIds"].AsBsonArray)
+                    {
+                        // Recherche le film correspondant dans la bibliothèque.
+                        Movie? movie = movies.FirstOrDefault(
+                            m => m.Id == movieId.ToInt32()
+                        );
+
+                        // Ajoute le film s'il existe.
+                        if (movie != null)
+                        {
+                            collection.addMovie(movie);
+                        }
+                    }
+                }
+
+                // Ajoute la collection reconstituée à la liste.
+                collections.Add(collection);
+            }
+
+            // Retourne toutes les collections reconstituées.
+            return collections;
+        }
+
+        /// <summary>
+        /// Supprime une collection à partir de son nom.
+        /// </summary>
+        public async Task<bool> DeleteCollectionAsync(string name)
+        {
+            var filter = Builders<BsonDocument>.Filter
+                .Eq("name", name);
+
+            var result = await _collections.DeleteOneAsync(filter);
 
             return result.DeletedCount > 0;
         }

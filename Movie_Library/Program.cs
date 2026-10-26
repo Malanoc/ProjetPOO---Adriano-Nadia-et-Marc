@@ -1,4 +1,5 @@
 using Movie_Library.Classes;
+using Movie_Library.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,9 @@ builder.Services.AddSingleton<Movie_Library.Data.MongoDbService>(sp =>
 
     return new Movie_Library.Data.MongoDbService(configuration);
 });
+
+builder.Services.AddSingleton<MovieRepository>();
+builder.Services.AddSingleton<CollectionRepository>();
 
 var app = builder.Build();
 
@@ -49,7 +53,30 @@ var mongoService =
 if (mongoService.TestConnection())
 {
     Console.WriteLine("Connexion avec MongoDB réussie.");
+
+    // Récupère la bibliothèque partagée de l'application.
+    var library = app.Services.GetRequiredService<Library>();
+
+    try
+    {
+        // Récupère les collections et leurs films depuis MongoDB.
+        var collections = await mongoService.LoadCollectionsAsync();
+
+        // Charge les collections récupérées dans la bibliothèque en mémoire.
+        library.LoadCollections(collections);
+
+        Console.WriteLine(
+            $"{collections.Count} collection(s) chargée(s) depuis MongoDB."
+        );
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine(
+            $"Erreur lors du chargement des collections : {ex.Message}"
+        );
+    }
 }
+
 else
 {
     Console.WriteLine(

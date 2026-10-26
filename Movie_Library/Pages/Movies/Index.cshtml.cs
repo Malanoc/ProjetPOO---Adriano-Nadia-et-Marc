@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Movie_Library.Classes;
 using Movie_Library.Classes.Tmdb;
-using Movie_Library.Data;
+using Movie_Library.Repositories;
 using System.Globalization;
 using LibraryClass = Movie_Library.Classes.Library;
 
@@ -12,7 +12,7 @@ namespace Movie_Library.Pages.Movies
     {
         private readonly LibraryClass _library;
 
-        private readonly MongoDbService _mongoDbService;
+        private readonly MovieRepository _movieRepository;
 
         public List<Movie> FoundMovies { get; private set; } = new();
 
@@ -24,10 +24,9 @@ namespace Movie_Library.Pages.Movies
         public string? Message { get; private set; }
 
 
-        public IndexModel(
-            MongoDbService mongoDbService)
+        public IndexModel(MovieRepository movieRepository)
         {
-            _mongoDbService = mongoDbService;
+            _movieRepository = movieRepository;
 
             _library =
                 new LibraryClass("Ma bibliothèque");
@@ -112,7 +111,7 @@ namespace Movie_Library.Pages.Movies
             {
                 // Sauvegarde dans MongoDB.
                 bool added =
-                    await _mongoDbService.AddMovieAsync(movie);
+                    await _movieRepository.AddAsync(movie);
 
                 if (added)
                 {
@@ -146,7 +145,7 @@ namespace Movie_Library.Pages.Movies
         private async Task LoadLibraryAsync()
         {
             List<Movie> movies =
-                await _mongoDbService.GetMoviesAsync();
+                    await _movieRepository.GetAllAsync();
 
             foreach (Movie movie in movies)
             {

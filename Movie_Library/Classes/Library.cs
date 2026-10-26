@@ -267,7 +267,15 @@ namespace Movie_Library.Classes
                 );
             }
         }
-
+        /// <summary>
+        /// Charge les collections fournies dans la liste des collections de la bibliothèque.
+        /// </summary>
+        /// <param name="collections"></param>
+        public void LoadCollections(IEnumerable<Collection> collections)
+        {
+            _collections.Clear();
+            _collections.AddRange(collections);
+        }
 
         /// <summary>
         /// Supprime une collection de la bibliothèque.
