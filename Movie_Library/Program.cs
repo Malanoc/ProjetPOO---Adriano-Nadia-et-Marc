@@ -50,17 +50,30 @@ app.MapControllers();
 var mongoService =
     app.Services.GetRequiredService<Movie_Library.Data.MongoDbService>();
 
+// Récupère la bibliothèque partagée de l'application.
+    var library = app.Services.GetRequiredService<Library>();
+
 if (mongoService.TestConnection())
 {
     Console.WriteLine("Connexion avec MongoDB réussie.");
 
-    // Récupère la bibliothèque partagée de l'application.
-    var library = app.Services.GetRequiredService<Library>();
+    
 
     try
-    {
+    { 
+        // Récupère tous les films sauvegardés dans MongoDB.
+        var movies = await mongoService.GetMoviesAsync();
+
+        // Charge les films dans la bibliothèque en mémoire.
+        library.LoadMovies(movies);
+
+        Console.WriteLine(
+            $"{movies.Count} film(s) chargé(s) depuis MongoDB."
+        );
+
+
         // Récupère les collections et leurs films depuis MongoDB.
-        var collections = await mongoService.LoadCollectionsAsync();
+        var collections = await mongoService.LoadCollectionsAsync(movies);
 
         // Charge les collections récupérées dans la bibliothèque en mémoire.
         library.LoadCollections(collections);
@@ -71,17 +84,23 @@ if (mongoService.TestConnection())
     }
     catch (Exception ex)
     {
-        Console.WriteLine(
-            $"Erreur lors du chargement des collections : {ex.Message}"
+        library.StartupDataWarning =
+            "Les données sauvegardées n'ont pas pu être chargées.";
+
+        Console.Error.WriteLine(
+            $"Erreur lors du chargement des données MongoDB : {ex}"
         );
     }
 }
 
 else
 {
-    Console.WriteLine(
-        "Echec de la connexion avec MongoDB. " +
-        "Verifiez que votre serveur local est demarre."
+    library.StartupDataWarning =
+        "Impossible de se connecter à MongoDB. " +
+        "Les données sauvegardées peuvent être indisponibles.";
+
+    Console.Error.WriteLine(
+        "Échec de la connexion à MongoDB. Vérifiez que le serveur est démarré."
     );
 }
 

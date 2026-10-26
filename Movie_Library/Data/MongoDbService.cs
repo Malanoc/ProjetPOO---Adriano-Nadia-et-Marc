@@ -119,8 +119,8 @@ namespace Movie_Library.Data
                 {
                     { "_id", movie.Id },
                     { "title", movie.Title },
-                    { "synopsis", movie.Synopsis },
-                    { "poster", movie.Poster },
+                    { "synopsis", movie.Synopsis ?? string.Empty },
+                    { "poster", movie.Poster ?? string.Empty },
                     { "ratingTMDB", (double)movie.RatingTMDB },
                     { "personalRating", (double)movie.PersonalRating },
                     { "personalNote", movie.PersonalNote ?? string.Empty },
@@ -345,13 +345,11 @@ namespace Movie_Library.Data
         /// Récupère les collections enregistrées dans MongoDB
         /// et reconstitue leurs listes de films.
         /// </summary>
-        public async Task<List<Collection>> LoadCollectionsAsync()
+        public async Task<List<Collection>> LoadCollectionsAsync(IEnumerable<Movie> movies)
         {
             // Récupère toutes les collections enregistrées dans MongoDB.
             List<BsonDocument> documents = await GetCollectionsAsync();
 
-            // Récupère les films enregistrés dans la bibliothèque.
-            List<Movie> movies = await GetMoviesAsync();
 
             // Prépare la liste des collections à reconstituer.
             List<Collection> collections = new();

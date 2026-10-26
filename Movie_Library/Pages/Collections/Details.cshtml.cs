@@ -131,6 +131,14 @@ namespace Movie_Library.Pages.Collections
         [TempData]
         public string? SuccessMessage { get; set; }
 
+        /// <summary>
+        /// Message affiché s'il y a une erreur lors l'ajout de films.
+        ///
+        /// TempData permet de conserver le message
+        /// pendant la redirection.
+        /// </summary>
+        [TempData]
+        public string? ErrorMessage { get; set; }
 
         /// <summary>
         /// Constructeur de la page.
@@ -194,9 +202,25 @@ namespace Movie_Library.Pages.Collections
         /// </summary>
         private async Task LoadLibraryMoviesAsync()
         {
-            LibraryMovies =
-                await _movieRepository.GetAllAsync();
+            try
+            {
+                LibraryMovies = await _movieRepository.GetAllAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    $"Erreur lors du chargement des films : {ex.Message}"
+        );
+
+                // Utilise les films déjà présents en mémoire si disponibles.
+                LibraryMovies = Library.Movies.ToList();
+
+                ErrorMessage =
+                    "Impossible de charger les films depuis la base de données. " +
+                    "Les données disponibles en mémoire peuvent rester accessibles.";
+            }
         }
+
 
         /// <summary>
         /// Ajoute un ou plusieurs films
@@ -246,6 +270,7 @@ namespace Movie_Library.Pages.Collections
              * de confirmation.
              */
             int addedMoviesCount = 0;
+            List<MovieClass> newlyAddedMovies = new();
 
 
             /*
@@ -308,6 +333,7 @@ namespace Movie_Library.Pages.Collections
                  * n'est nécessaire.
                  */
                 CurrentCollection.addMovie(movie);
+                newlyAddedMovies.Add(movie);
 
                 addedMoviesCount++;
             }
@@ -333,8 +359,31 @@ namespace Movie_Library.Pages.Collections
                 return Page();
             }
 
-            // Ajout de la sauvegarde, s'execute uniquement si au moins un film a été ajouté.
-            await _collectionRepository.SaveAsync(CurrentCollection!);
+            try
+            {
+                await _collectionRepository.SaveAsync(CurrentCollection!);
+            }
+            catch (Exception ex)
+            {
+                // Annule les ajouts en mémoire si MongoDB refuse la sauvegarde.
+                foreach (MovieClass addedMovie in newlyAddedMovies)
+                {
+                    CurrentCollection!.RemoveMovie(addedMovie);
+                }
+
+                Console.Error.WriteLine(
+                    $"Erreur lors de la sauvegarde de la collection : {ex}"
+                );
+
+                ErrorMessage =
+                    "Impossible d'enregistrer la collection. " +
+                    "Vérifiez votre connexion à la base de données, puis réessayez.";
+
+                return RedirectToPage(
+                    "/Collections/Details",
+                    new { name = CollectionName }
+                );
+            }
 
             /*
              * Message de confirmation.
@@ -447,7 +496,27 @@ namespace Movie_Library.Pages.Collections
              * Le film reste donc dans la bibliothèque.
              */
             collection.RemoveMovie(movie);
-            await _collectionRepository.SaveAsync(collection);
+            try
+            {
+                await _collectionRepository.SaveAsync(collection);
+            }
+            catch (Exception ex)
+            {
+                // Restaure l'association si la sauvegarde échoue.
+                collection.addMovie(movie);
+
+                Console.Error.WriteLine(
+                    $"Erreur lors du retrait d'un film de la collection : {ex}"
+                );
+
+                return new JsonResult(new
+                {
+                    success = false,
+                    message =
+                        "Impossible d'enregistrer le retrait du film. " +
+                        "Vérifiez la connexion à la base de données, puis réessayez."
+                });
+            }
 
 
             return new JsonResult(new
@@ -558,22 +627,77 @@ namespace Movie_Library.Pages.Collections
              * donc aucune modification de Collection.cs
              * n'est nécessaire.
              */
-            CurrentCollection!.Name =
-                newName;
 
+            string oldName = CurrentCollection!.Name;
+            string oldPoster = CurrentCollection.Poster;
 
-            /*
-             * Modification du poster.
-             *
-             * Le poster peut être vide.
-             */
+            // Modifie la collection en mémoire.
+            CurrentCollection.Name = newName;
             CurrentCollection.Poster =
-                EditCollectionPoster?.Trim()
-                ?? string.Empty;
+                EditCollectionPoster?.Trim() ?? string.Empty;
 
-            // Supprime l'ancient document puis sauvegarde la collection renommée.
-            await _collectionRepository.DeleteAsync(OriginalCollectionName);
-            await _collectionRepository.SaveAsync(CurrentCollection);
+            // Enregistre la nouvelle version dans MongoDB.
+            try
+            {
+                await _collectionRepository.SaveAsync(CurrentCollection);
+            }
+            catch (Exception ex)
+            {
+                // Restaure les anciennes valeurs si la sauvegarde échoue.
+                CurrentCollection.Name = oldName;
+                CurrentCollection.Poster = oldPoster;
+
+                Console.Error.WriteLine(
+                    $"Erreur lors de la sauvegarde de la collection : {ex.Message}"
+                );
+
+                ErrorMessage =
+                    "Impossible d'enregistrer la collection. " +
+                    "Vérifiez la connexion à la base de données, puis réessayez.";
+
+                return RedirectToPage(
+                    "/Collections/Details",
+                    new { name = oldName }
+                );
+            }
+
+            // Supprime l'ancien document uniquement si le nom a changé.
+            if (!string.Equals(oldName, newName, StringComparison.Ordinal))
+            {
+                try
+                {
+                    bool deleted =
+                        await _collectionRepository.DeleteAsync(oldName);
+
+                    if (!deleted)
+                    {
+                        ErrorMessage =
+                            "La nouvelle collection a été enregistrée, " +
+                            "mais l'ancien enregistrement n'a pas été supprimé.";
+
+                        return RedirectToPage(
+                            "/Collections/Details",
+                            new { name = newName }
+                        );
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(
+                        $"Erreur lors de la suppression de l'ancienne collection : {ex.Message}"
+                    );
+
+                    ErrorMessage =
+                        "La nouvelle collection a été enregistrée, mais la suppression " +
+                        "de l'ancien enregistrement a échoué. Vérifiez la base de données.";
+
+                    return RedirectToPage(
+                        "/Collections/Details",
+                        new { name = newName }
+                    );
+                }
+            }
+
             /*
              * Message affiché après redirection.
              */

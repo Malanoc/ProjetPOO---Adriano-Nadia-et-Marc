@@ -8,6 +8,14 @@
 <div class="library-page">
     <div class="container">
 
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @Model.ErrorMessage
+            </div>
+        }
+
+
         <!-- EN-TÊTE DE LA BIBLIOTHÈQUE -->
         <header class="library-header">
             <div>

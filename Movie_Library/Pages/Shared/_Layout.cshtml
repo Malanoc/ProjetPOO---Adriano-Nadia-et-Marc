@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@inject Movie_Library.Classes.Library Library
+
+<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="utf-8" />
@@ -83,8 +85,16 @@
 
     <div class="container">
 
-        <main role="main" class="pb-3">
-            @RenderBody()
+		<main role="main" class="pb-3">
+
+			@if (!string.IsNullOrWhiteSpace(Library.StartupDataWarning))
+			{
+			<div class="alert alert-warning" role="alert">
+				@Library.StartupDataWarning
+			</div>
+			}
+
+			@RenderBody()
         </main>
 
     </div>

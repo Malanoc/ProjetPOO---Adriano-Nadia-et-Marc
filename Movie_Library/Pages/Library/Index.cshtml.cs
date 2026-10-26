@@ -35,13 +35,14 @@ namespace Movie_Library.Pages.Library
         /// Bibliothèque affichée dans la page.
         /// </summary>
         internal LibraryClass Library { get; private set; }
+        public string? ErrorMessage { get; private set; }
 
         /// <summary>
         /// Initialise le modèle de la page.
         /// Les repositories et la bibliothèque partagée
         /// sont injectés par ASP.NET Core.
         /// </summary>
-        public IndexModel(MovieRepository movieRepository,CollectionRepository collectionRepository,LibraryClass sharedLibrary)
+        public IndexModel(MovieRepository movieRepository, CollectionRepository collectionRepository, LibraryClass sharedLibrary)
         {
             _movieRepository = movieRepository;
 
@@ -60,7 +61,7 @@ namespace Movie_Library.Pages.Library
              */
             Library = new LibraryClass("Ma bibliothèque");
         }
-        
+
 
         /// <summary>
         /// Charge les films depuis MongoDB à l'ouverture de la page.
@@ -75,14 +76,28 @@ namespace Movie_Library.Pages.Library
         /// </summary>
         private async Task LoadLibraryAsync()
         {
-            List<Movie> movies =
-                await _movieRepository.GetAllAsync();
-
-            Library = new LibraryClass("Ma bibliothèque");
-
-            foreach (Movie movie in movies)
+            try
             {
-                Library.addMovies(movie);
+                List<Movie> movies = await _movieRepository.GetAllAsync();
+
+                Library = new LibraryClass("Ma bibliothèque");
+
+                foreach (Movie movie in movies)
+                {
+                    Library.addMovies(movie);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    $"Erreur lors du chargement des films : {ex.Message}"
+                );
+
+                Library = new LibraryClass("Ma bibliothèque");
+
+                ErrorMessage =
+                    "Impossible de charger les films depuis la base de données. " +
+                    "Vérifiez que le serveur est démarré.";
             }
         }
 
@@ -121,13 +136,33 @@ namespace Movie_Library.Pages.Library
             }
 
             // Enregistre les modifications dans MongoDB.
-            bool updated =
-                await _movieRepository.UpdateDetailsAsync(
+            bool updated;
+
+            try
+            {
+                updated = await _movieRepository.UpdateDetailsAsync(
                     id,
                     parsedStatus,
                     personalRating,
                     personalNote ?? string.Empty
                 );
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(
+                    $"Erreur lors de l'enregistrement du film : {ex.Message}"
+                );
+
+                return new JsonResult(new
+                {
+                    success = false,
+                    message =
+                        "Impossible d'enregistrer les modifications. " +
+                        "Vérifiez que la base de données a été démarré, puis réessayez."
+                });
+            }
+
+
 
             return new JsonResult(new
             {
@@ -157,58 +192,70 @@ namespace Movie_Library.Pages.Library
              * MongoDB représente actuellement la source principale
              * des films présents dans la bibliothèque.
              */
-            bool deleted =
-                await _movieRepository.DeleteAsync(id);
+            bool movieDeleted = false;
 
-
-            /*
-             * Si le film a bien été supprimé de la bibliothèque,
-             * on doit également le retirer de toutes les collections.
-             */
-            if (deleted)
+            try
             {
-                /*
-                 * Parcourt toutes les collections.
-                 */
+                // Supprime le film dans MongoDB.
+                bool deleted = await _movieRepository.DeleteAsync(id);
+
+                if (!deleted)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Ce film n'existe plus dans la bibliothèque."
+                    });
+                }
+
+                movieDeleted = true;
+
+                // Retire le film des collections qui le contiennent.
                 foreach (var collection in _sharedLibrary.Collections)
                 {
-                    /*
-                     * Recherche dans cette collection le film
-                     * possédant le même identifiant TMDB.
-                     */
                     Movie? movieInCollection =
-                        collection.Movies.FirstOrDefault(
-                            movie =>
-                                movie.Id == id
-                        );
+                        collection.Movies.FirstOrDefault(movie => movie.Id == id);
 
-
-                    /*
-                     * Si le film est présent dans cette collection,
-                     * on le retire.
-                     */
                     if (movieInCollection != null)
                     {
-                        collection.RemoveMovie(
-                            movieInCollection
-                        );
+                        collection.RemoveMovie(movieInCollection);
 
-                        // Sauvegarde la collection après sa modification dans MongoDB.
-                        await _collectionRepository.SaveAsync(collection);
+                        try
+                        {
+                            await _collectionRepository.SaveAsync(collection);
+                        }
+                        catch
+                        {
+                            // Restaure le film dans la collection en mémoire.
+                            collection.addMovie(movieInCollection);
+                            throw;
+                        }
                     }
                 }
+
+                return new JsonResult(new
+                {
+                    success = true,
+                    id,
+                    message =
+                        "Le film a été supprimé de votre bibliothèque et de vos collections."
+                });
             }
-
-
-            return new JsonResult(new
+            catch (Exception ex)
             {
-                success = deleted,
-                id,
+                Console.Error.WriteLine(
+                    $"Erreur lors de la suppression du film : {ex.Message}"
+                );
 
-                message = deleted
-                    ? "Le film a été supprimé de votre bibliothèque et de vos collections."
-                    : "Ce film n'existe plus dans la bibliothèque."
-            });
+                return new JsonResult(new
+                {
+                    success = false,
+                    id,
+                    message = movieDeleted
+                ? "Le film a été supprimé, mais la mise à jour d'une collection a échoué. Vérifiez les données."
+                : "Impossible de supprimer le film. Vérifiez que la base de données, puis réessayez."
+                });
+            }
         }
     }
 }

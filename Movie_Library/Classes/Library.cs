@@ -91,6 +91,8 @@ namespace Movie_Library.Classes
             get { return _collections; }
         }
 
+        // Message d'avertissement si le chargement des données échoue.
+        public string? StartupDataWarning { get; set; }
 
         /// <summary>
         /// Ajoute un film à la bibliothèque.
@@ -276,6 +278,18 @@ namespace Movie_Library.Classes
             _collections.Clear();
             _collections.AddRange(collections);
         }
+
+
+        /// <summary>
+        /// Charge les films récupérés depuis MongoDB
+        /// dans la bibliothèque en mémoire.
+        /// </summary>
+        public void LoadMovies(IEnumerable<Movie> movies)
+        {
+            _movies.Clear();
+            _movies.AddRange(movies);
+        }
+
 
         /// <summary>
         /// Supprime une collection de la bibliothèque.
