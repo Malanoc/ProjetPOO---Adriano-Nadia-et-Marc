@@ -1,0 +1,366 @@
+﻿@page
+@model Movie_Library.Pages.Library.IndexModel
+
+@{
+    ViewData["Title"] = "Ma bibliothèque";
+}
+
+<div class="library-page">
+    <div class="container">
+
+        @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger" role="alert">
+                @Model.ErrorMessage
+            </div>
+        }
+
+
+        <!-- EN-TÊTE DE LA BIBLIOTHÈQUE -->
+        <header class="library-header">
+            <div>
+                <span class="home-kicker">
+                    Votre cinémathèque
+                </span>
+
+                <h1>Ma bibliothèque</h1>
+
+                <p>
+                    Les films que vous avez décidé de garder.
+                </p>
+            </div>
+
+            <div class="library-count" id="library-count">
+                @Model.Library.Movies.Count
+                film@(Model.Library.Movies.Count > 1 ? "s" : "")
+            </div>
+        </header>
+
+
+        <!-- TRI ET FILTRAGE -->
+        <div class="library-toolbar">
+            <div class="row g-3 align-items-end">
+
+                <!-- Critère de tri -->
+                <div class="col-12 col-md-4">
+                    <label for="sort" class="form-label">
+                        Trier par
+                    </label>
+
+                    <select id="sort" class="form-select">
+                        <option value="title">Titre</option>
+                        <option value="rating">Note TMDB</option>
+                        <option value="status">Statut</option>
+                    </select>
+                </div>
+
+                <!-- Sens du tri -->
+                <div class="col-12 col-md-4">
+                    <label for="sort-direction" class="form-label">
+                        Ordre
+                    </label>
+
+                    <select id="sort-direction" class="form-select">
+                        <option value="asc">Croissant</option>
+                        <option value="desc">Décroissant</option>
+                    </select>
+                </div>
+
+                <!-- Filtre par statut -->
+                <div class="col-12 col-md-4">
+                    <label for="status" class="form-label">
+                        Filtrer
+                    </label>
+
+                    <select id="status" class="form-select">
+                        <option value="all">Tous les films</option>
+                        <option value="notseen">Non vus</option>
+                        <option value="inprogress">En cours</option>
+                        <option value="seen">Vus</option>
+                    </select>
+                </div>
+
+            </div>
+        </div>
+
+
+        <!-- ÉTAT VIDE -->
+        <div id="library-empty-state"
+             class="library-empty @(Model.Library.Movies.Count > 0 ? "d-none" : "")">
+
+            <span class="home-kicker">
+                Aucun film
+            </span>
+
+            <h2>Votre bibliothèque est encore vide.</h2>
+
+            <p>
+                Recherchez un film pour commencer à construire
+                votre propre cinémathèque.
+            </p>
+
+            <a asp-page="/Movies/Index" class="btn btn-primary">
+                Rechercher un film
+            </a>
+        </div>
+
+
+        <!-- GRILLE DES FILMS -->
+        <div id="movie-grid"
+             class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 movie-grid @(Model.Library.Movies.Count == 0 ? "d-none" : "")">
+
+            @foreach (var movie in Model.Library.Movies)
+            {
+                <div class="col movie-item"
+                     role="button"
+                     tabindex="0"
+                     aria-label="Gérer le film @movie.Title"
+                     data-movie-id="@movie.Id"
+                     data-title="@movie.Title"
+                     data-synopsis="@movie.Synopsis"
+                     data-poster="@movie.Poster"
+                     data-status="@movie.Status.ToString().ToLowerInvariant()"
+                     data-rating="@movie.RatingTMDB.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-personal-rating="@movie.PersonalRating.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                     data-personal-note="@movie.PersonalNote">
+
+                    <article class="movie-card">
+
+                        <!-- AFFICHE -->
+                        <div class="movie-poster">
+                            @if (!string.IsNullOrWhiteSpace(movie.Poster))
+                            {
+                                <img src="@movie.Poster"
+                                     alt="@movie.Title"
+                                     loading="lazy" />
+                            }
+                            else
+                            {
+                                <div class="movie-poster-placeholder">
+                                    Pas d'affiche
+                                </div>
+                            }
+                        </div>
+
+                        <!-- INFORMATIONS DU FILM -->
+                        <div class="movie-info">
+
+                            <h2 class="movie-title">
+                                @movie.Title
+                            </h2>
+
+                            <!-- Statut et note TMDB -->
+                            <div class="movie-meta">
+                                <span class="movie-status-label">
+                                    @(
+                                        movie.Status == Movie_Library.Classes.Status.NotSeen
+                                            ? "Non vu"
+                                            : movie.Status == Movie_Library.Classes.Status.InProgress
+                                                ? "En cours"
+                                                : "Vu"
+                                    )
+                                </span>
+
+                                @if (movie.RatingTMDB > 0)
+                                {
+                                    <span class="movie-rating">
+                                        @movie.RatingTMDB.ToString("0.0") / 10
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Note personnelle, si elle existe -->
+                            @if (movie.PersonalRating > 0)
+                            {
+                                <p class="movie-personal-rating">
+                                    <span>Note personnelle :</span>
+                                    <span>
+                                        @movie.PersonalRating.ToString("0.0") / 10
+                                    </span>
+                                </p>
+                            }
+
+                        </div>
+                    </article>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =====================================================
+     MODALE DE GESTION DU FILM
+     ===================================================== -->
+
+<div class="modal fade"
+     id="movie-details-modal"
+     tabindex="-1"
+     aria-labelledby="movie-modal-title"
+     aria-hidden="true"
+     data-save-url="@Url.Page("/Library/Index", "SaveDetails")"
+     data-delete-url="@Url.Page("/Library/Index", "Delete")">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content movie-modal-content">
+
+            <!-- EN-TÊTE -->
+            <div class="modal-header">
+                <div>
+                    <span class="home-kicker">
+                        Gestion du film
+                    </span>
+
+                    <h2 class="modal-title h3" id="movie-modal-title"></h2>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fermer">
+                </button>
+            </div>
+
+
+            <!-- CONTENU -->
+            <div class="modal-body">
+
+                <div id="movie-modal-message"
+                     class="alert d-none"
+                     role="status"
+                     aria-live="polite">
+                </div>
+
+                <!-- Protection antiforgery -->
+                @Html.AntiForgeryToken()
+
+                <div class="row g-4">
+
+                    <!-- AFFICHE -->
+                    <div class="col-12 col-sm-4">
+                        <div class="movie-poster">
+
+                            <img id="movie-modal-poster"
+                                 src=""
+                                 alt=""
+                                 loading="lazy" />
+
+                            <div id="movie-modal-no-poster"
+                                 class="movie-poster-placeholder d-none">
+                                Pas d'affiche
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- INFORMATIONS -->
+                    <div class="col-12 col-sm-8">
+
+                        <div class="movie-modal-rating mb-3">
+                            <span class="movie-rating">
+                                Note TMDB
+                            </span>
+
+                            <strong id="movie-modal-tmdb-rating"></strong>
+                        </div>
+
+                        <!-- STATUT -->
+                        <h3 class="h5">
+                            Statut du visionnage
+                        </h3>
+
+                        <select id="movie-modal-status"
+                                class="form-select mb-4">
+
+                            <option value="NotSeen">Non vu</option>
+                            <option value="InProgress">En cours</option>
+                            <option value="Seen">Vu</option>
+
+                        </select>
+
+                        <!-- SYNOPSIS -->
+                        <h3 class="h5">
+                            Synopsis
+                        </h3>
+
+                        <p id="movie-modal-synopsis"></p>
+
+                    </div>
+
+                </div>
+
+                <hr class="my-4" />
+
+                <!-- NOTE PERSONNELLE -->
+                <div class="mb-3">
+                    <label for="movie-modal-personal-rating"
+                           class="form-label">
+                        Ma note personnelle sur 10
+                    </label>
+
+                    <input id="movie-modal-personal-rating"
+                           type="number"
+                           class="form-control"
+                           min="0"
+                           max="10"
+                           step="0.5"
+                           value="0" />
+                </div>
+
+                <!-- COMMENTAIRE PERSONNEL -->
+                <div class="mb-3">
+                    <label for="movie-modal-personal-note"
+                           class="form-label">
+                        Mes notes personnelles
+                    </label>
+
+                    <textarea id="movie-modal-personal-note"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Écris tes impressions sur ce film..."></textarea>
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        id="movie-modal-delete"
+                        class="btn btn-outline-danger">
+                    Supprimer le film
+                </button>
+
+                <div class="d-flex gap-2">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Fermer
+                    </button>
+
+                    <button type="button"
+                            id="movie-modal-save"
+                            class="btn btn-primary">
+                        Enregistrer
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<!-- CHARGEMENT DU JAVASCRIPT -->
+@section Scripts {
+    <script src="~/js/library.js" asp-append-version="true"></script>
+}

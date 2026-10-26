@@ -1,0 +1,780 @@
+/* =========================================================
+   VARIABLES / IDENTITÉ VISUELLE
+   ========================================================= */
+
+:root {
+    /* Couleurs principales */
+    --bg: #1b1d29;
+    --surface: #191716;
+    --surface-light: #24201E;
+    /* Texte */
+    --text: #E8E1D7;
+    --text-muted: #A69F96;
+    /* Couleur principale du site */
+    --accent: #C94B3C;
+    --accent-hover: #B64032;
+    /* Couleur secondaire */
+    --gold: #C9A96E;
+    /* Bordures */
+    --border: #35302C;
+}
+
+
+/* =========================================================
+   STRUCTURE GÉNÉRALE
+   ========================================================= */
+
+html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
+    margin-bottom: 60px;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+
+/* =========================================================
+   ÉLÉMENTS HTML GÉNÉRAUX
+   ========================================================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text);
+}
+
+p {
+    color: var(--text-muted);
+}
+
+a {
+    color: var(--accent);
+}
+
+    a:hover {
+        color: var(--accent-hover);
+    }
+
+
+/* =========================================================
+   ACCESSIBILITÉ / FOCUS
+   ========================================================= */
+
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.1rem var(--bg), 0 0 0 0.25rem var(--accent);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.navbar {
+    background-color: var(--bg) !important;
+    border-bottom: 1px solid var(--border) !important;
+}
+
+/* Nom du site */
+.navbar-brand {
+    color: var(--text) !important;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+/* Liens de navigation */
+.navbar .nav-link {
+    color: var(--text-muted) !important;
+    transition: color 0.2s ease;
+}
+
+    .navbar .nav-link:hover,
+    .navbar .nav-link.active {
+        color: var(--text) !important;
+    }
+
+    /* Indicateur du lien actif */
+    .navbar .nav-link.active {
+        position: relative;
+    }
+
+        .navbar .nav-link.active::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 4px;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+/* Icône du menu hamburger sur mobile */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='%23C94B3C' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer {
+    background-color: var(--bg);
+    border-top: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+    .footer a {
+        color: var(--text-muted);
+    }
+
+        .footer a:hover {
+            color: var(--text);
+        }
+
+
+/* =========================================================
+   BOUTONS
+   ========================================================= */
+
+/* Bouton principal */
+.btn-primary {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+    .btn-primary:hover {
+        background-color: var(--accent-hover);
+        border-color: var(--accent-hover);
+        color: #fff;
+    }
+
+/* Bouton avec contour */
+.btn-outline-primary {
+    color: var(--text);
+    border-color: var(--border);
+}
+
+    .btn-outline-primary:hover {
+        background-color: var(--surface-light);
+        border-color: var(--accent);
+        color: var(--text);
+    }
+
+/* Bouton secondaire */
+.btn-outline-secondary {
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+
+    .btn-outline-secondary:hover {
+        background-color: var(--surface-light);
+        border-color: var(--text-muted);
+        color: var(--text);
+    }
+
+
+/* =========================================================
+   FORMULAIRES
+   ========================================================= */
+
+.form-control,
+.form-select {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+    /* Texte indicatif dans les champs */
+    .form-control::placeholder {
+        color: #736D67;
+    }
+
+    /* Champs lorsqu'ils sont sélectionnés */
+    .form-control:focus,
+    .form-select:focus {
+        background-color: var(--surface);
+        color: var(--text);
+        border-color: var(--accent);
+    }
+
+    /* Options des listes déroulantes */
+    .form-select option {
+        background-color: var(--surface);
+        color: var(--text);
+    }
+
+
+/* =========================================================
+   PAGE D'ACCUEIL
+   ========================================================= */
+
+.home-page {
+    padding-top: 2rem;
+}
+
+/* Petit titre au-dessus des grands titres */
+.home-kicker {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+/* Section principale */
+.home-hero {
+    padding: 5rem 0 6rem;
+    border-bottom: 1px solid var(--border);
+}
+
+    /* Grand titre */
+    .home-hero h1 {
+        max-width: 700px;
+        font-size: clamp(2.8rem, 5vw, 4.2rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+    }
+
+        /* Partie accentuée du titre */
+        .home-hero h1 span {
+            color: var(--accent);
+        }
+
+    /* Description principale */
+    .home-hero p {
+        max-width: 650px;
+        margin-top: 2rem;
+        font-size: 1.15rem;
+        line-height: 1.8;
+    }
+
+/* Boutons du hero */
+.home-actions {
+    margin-top: 2.5rem;
+}
+
+    .home-actions .btn {
+        padding: 0.75rem 1.4rem;
+        border-radius: 4px;
+    }
+
+
+/* =========================================================
+   SECTIONS DE LA PAGE D'ACCUEIL
+   ========================================================= */
+
+.home-section {
+    padding: 5rem 0;
+}
+
+/* Titre + description d'une section */
+.home-section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+    .home-section-heading h2 {
+        margin: 0;
+        font-size: 2.2rem;
+        letter-spacing: -0.035em;
+    }
+
+    .home-section-heading p {
+        max-width: 450px;
+        margin: 0;
+        text-align: right;
+    }
+
+
+/* =========================================================
+   FONCTIONNALITÉS DE LA PAGE D'ACCUEIL
+   ========================================================= */
+
+.home-feature {
+    height: 100%;
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+}
+
+/* Numéro de fonctionnalité */
+.home-feature-number {
+    color: var(--accent);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+/* Titre de la fonctionnalité */
+.home-feature h3 {
+    margin-top: 1rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.35rem;
+}
+
+/* Description */
+.home-feature p {
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   BLOC D'APPEL À L'ACTION
+   ========================================================= */
+
+.home-cta {
+    margin-bottom: 4rem;
+    padding: 2.5rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+    .home-cta h2 {
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+    }
+
+    .home-cta p {
+        margin-bottom: 0;
+    }
+
+
+/* =========================================================
+   PAGE BIBLIOTHÈQUE
+   ========================================================= */
+
+.library-page {
+    padding-top: 3rem;
+}
+
+/* En-tête de la bibliothèque */
+.library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+    .library-header h1 {
+        margin: 0;
+        font-size: 3.5rem;
+        letter-spacing: -0.05em;
+    }
+
+    .library-header p {
+        margin: 0.75rem 0 0;
+    }
+
+/* Nombre de films */
+.library-count {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   FILTRES DE LA BIBLIOTHÈQUE
+   ========================================================= */
+
+.library-toolbar {
+    margin-bottom: 3rem;
+    padding: 1rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+    .library-toolbar .form-label {
+        margin-bottom: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .library-toolbar .form-select {
+        min-height: 42px;
+        border-radius: 3px;
+    }
+
+
+/* =========================================================
+   BIBLIOTHÈQUE VIDE
+   ========================================================= */
+
+.library-empty {
+    padding: 6rem 1rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+    .library-empty h2 {
+        margin-bottom: 1rem;
+    }
+
+    .library-empty p {
+        max-width: 500px;
+        margin: 0 auto 1.5rem;
+    }
+
+
+/* =========================================================
+   GRILLE DE FILMS
+   ========================================================= */
+
+.movie-grid {
+    row-gap: 3rem !important;
+}
+
+/* Élément individuel de la grille */
+.movie-item {
+    transition: transform 0.2s ease;
+}
+
+    .movie-item:hover {
+        transform: translateY(-5px);
+    }
+
+
+/* =========================================================
+   CARTE D'UN FILM
+   ========================================================= */
+
+.movie-card {
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+    border: none !important;
+}
+
+
+/* =========================================================
+   AFFICHE DU FILM
+   ========================================================= */
+
+.movie-poster {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+}
+
+    /* Image de l'affiche */
+    .movie-poster img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+/* Petit effet au survol */
+.movie-card:hover .movie-poster img {
+    transform: scale(1.035);
+}
+
+/* Remplacement lorsqu'aucune affiche n'est disponible */
+.movie-poster-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+
+/* =========================================================
+   INFORMATIONS DU FILM
+   ========================================================= */
+
+.movie-info {
+    padding-top: 1rem;
+}
+
+/* Titre */
+.movie-title {
+    margin: 0;
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 600;
+}
+
+/* Informations secondaires */
+.movie-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+
+/* =========================================================
+   NOTES TMDB ET PERSONNELLES
+   ========================================================= */
+
+/* Note TMDB */
+.movie-rating {
+    color: var(--gold);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Ligne de la note personnelle */
+.movie-personal-rating {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    margin-top: 0.4rem;
+    margin-bottom: 0;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+    /* Libellé  */
+    .movie-personal-rating span:first-child {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 400;
+    }
+
+    /* Valeur de la note personnelle  */
+    .movie-personal-rating span:last-child {
+        color: var(--gold);
+        font-size: 0.8rem;
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+/* =========================================================
+   RESPONSIVE — PETITS ÉCRANS
+   ========================================================= */
+
+@media (max-width: 767px) {
+
+    /* Accueil */
+    .home-page {
+        padding-top: 0;
+    }
+
+    .home-hero {
+        padding: 4rem 0;
+    }
+
+        .home-hero h1 {
+            font-size: 3.4rem;
+        }
+
+    /* En-têtes */
+    .home-section-heading,
+    .library-header {
+        display: block;
+    }
+
+        .home-section-heading p {
+            margin-top: 1rem;
+            text-align: left;
+        }
+
+        /* Bibliothèque */
+        .library-header h1 {
+            font-size: 2.8rem;
+        }
+
+    .library-count {
+        display: block;
+        margin-top: 1rem;
+    }
+}
+
+
+/* =========================================================
+   MODALE DE GESTION D'UN FILM
+   ========================================================= */
+
+/* Les cartes de la bibliothèque sont interactives. */
+.movie-item {
+    cursor: pointer;
+}
+
+    .movie-item:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 5px;
+    }
+
+/* Conteneur de la modale */
+.movie-modal-content {
+    color: var(--text);
+    background-color: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+}
+
+    /* Séparateurs de la modale */
+    .movie-modal-content .modal-header,
+    .movie-modal-content .modal-footer {
+        border-color: var(--border);
+    }
+
+    /* Titre de la modale */
+    .movie-modal-content .modal-title {
+        color: var(--text);
+    }
+
+    /* Bouton de fermeture */
+    .movie-modal-content .btn-close {
+        filter: invert(1);
+    }
+
+    /* Libellés des formulaires */
+    .movie-modal-content .form-label {
+        color: var(--text);
+        font-weight: 600;
+    }
+
+/* Affichage de la note TMDB dans la modale */
+.movie-modal-rating {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+    .movie-modal-rating strong {
+        color: var(--gold);
+    }
+
+/* Champs de formulaire dans la modale */
+.movie-modal-content .form-control,
+.movie-modal-content .form-select {
+    background-color: var(--surface);
+    color: var(--text);
+    border-color: var(--border);
+}
+
+    .movie-modal-content .form-control:focus,
+    .movie-modal-content .form-select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 0.2rem rgba(201, 75, 60, 0.2);
+    }
+
+/* Séparateur dans le corps de la modale */
+.movie-modal-content .modal-body hr {
+    border-color: var(--border);
+    opacity: 1;
+}
+
+/* Adaptation de la modale sur mobile */
+@media (max-width: 575px) {
+    .movie-modal-content .modal-dialog {
+        margin: 0.5rem;
+    }
+
+    .movie-modal-content .modal-body {
+        padding: 1rem;
+    }
+
+    .movie-modal-content .modal-footer {
+        flex-wrap: wrap;
+    }
+
+        .movie-modal-content .modal-footer > * {
+            margin: 0;
+        }
+}
+
+
+/* =========================================================
+   RÉSULTATS DE RECHERCHE DE FILMS
+   ========================================================= */
+
+/* Les cartes de recherche ouvrent une modale de détails. */
+.movie-search-item {
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+    .movie-search-item:hover {
+        transform: translateY(-4px);
+    }
+
+/* Indication discrète : cliquer pour afficher les détails. */
+.movie-search-hint,
+.movie-search-status {
+    margin-top: 0.55rem;
+    margin-bottom: 0;
+    font-size: 0.75rem;
+}
+
+/* Indication affichée au survol ou au focus clavier. */
+.movie-search-hint {
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.movie-search-item:hover .movie-search-hint,
+.movie-search-item:focus-visible .movie-search-hint {
+    opacity: 1;
+}
+
+/* Film déjà présent dans la bibliothèque. */
+.movie-search-status {
+    color: var(--accent);
+}
+
+/* Focus visible pour la navigation au clavier. */
+.movie-search-item:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 5px;
+}
+
+/* Lecture confortable du synopsis dans la modale de recherche. */
+.search-movie-modal-synopsis {
+    line-height: 1.75;
+    white-space: pre-line;
+}
+
+/* Espacement vertical des résultats de recherche. */
+.movies-page .movie-grid {
+    row-gap: 2.5rem !important;
+}
+
+/* =========================================================
+   Collections
+   ========================================================= */
+
+.collection-edit-panel {
+    padding: 1.5rem;
+    border: 1px solid var(--border-color, #343434);
+    border-radius: 0.5rem;
+}

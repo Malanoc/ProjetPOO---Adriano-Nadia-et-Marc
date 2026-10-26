@@ -1,0 +1,24 @@
+﻿@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Une erreur est survenue";
+}
+
+<div class="text-center" style="margin-top: 50px; padding: 20px;">
+    
+    <h1 class="text-danger">Une erreur technique est survenue</h1>
+    
+    
+    <p class="lead" style="margin-top: 20px;">
+        Le service est temporairement indisponible. Nos équipes ont été alertées.
+    </p>
+    
+    <p class="text-muted">
+        Veuillez réessayer dans quelques instants ou retourner à la page d'accueil.
+    </p>
+
+   
+    <a href="/" class="btn btn-primary" style="margin-top: 20px; padding: 10px 20px;">
+        Retour à l'accueil
+    </a>
+</div>

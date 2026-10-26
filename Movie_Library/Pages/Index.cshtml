@@ -1,0 +1,201 @@
+﻿@page
+@model IndexModel
+
+@{
+    ViewData["Title"] = "Accueil";
+}
+
+<div class="home-page">
+
+    <!-- HERO -->
+    <section class="home-hero">
+        <div class="container">
+
+            <span class="home-kicker">
+                Movie Library
+            </span>
+
+            <h1>
+                Vos films.<br />
+                <span>Vos histoires.</span>
+            </h1>
+
+            <p>
+                Une bibliothèque personnelle pour rechercher,
+                organiser et suivre les films que vous avez envie
+                de voir, que vous regardez ou que vous avez déjà vus.
+            </p>
+
+            <div class="home-actions d-flex flex-wrap gap-2">
+                <a asp-page="/Movies/Index"
+                   class="btn btn-primary">
+                    Rechercher un film
+                </a>
+
+                <a asp-page="/Library/Index"
+                   class="btn btn-outline-primary">
+                    Ouvrir ma bibliothèque
+                </a>
+            </div>
+
+        </div>
+    </section>
+
+
+
+    <!-- FONCTIONNALITES -->
+    <section class="home-section">
+
+        <div class="container">
+
+            <div class="home-section-heading">
+
+                <div>
+                    <span class="home-kicker">
+                        Fonctionnalités
+                    </span>
+
+                    <h2>
+                        Pensé pour votre façon de regarder des films.
+                    </h2>
+                </div>
+
+                <p>
+                    Pas besoin d'une plateforme compliquée.
+                    Votre bibliothèque, simplement.
+                </p>
+
+            </div>
+
+
+            <div class="row g-5">
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="home-feature">
+
+                        <div class="home-feature-number">
+                            01
+                        </div>
+
+                        <h3>
+                            Rechercher
+                        </h3>
+
+                        <p>
+                            Trouvez un film grâce aux informations
+                            fournies par TMDB et consultez rapidement
+                            ses principales informations.
+                        </p>
+
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="home-feature">
+
+                        <div class="home-feature-number">
+                            02
+                        </div>
+
+                        <h3>
+                            Enregistrer
+                        </h3>
+
+                        <p>
+                            Ajoutez les films qui vous intéressent
+                            à votre bibliothèque afin de les retrouver
+                            facilement plus tard.
+                        </p>
+
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="home-feature">
+
+                        <div class="home-feature-number">
+                            03
+                        </div>
+
+                        <h3>
+                            Suivre
+                        </h3>
+
+                        <p>
+                            Indiquez si un film n'est pas encore vu,
+                            est actuellement en cours ou a déjà été regardé.
+                        </p>
+
+                    </div>
+                </div>
+
+
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="home-feature">
+
+                        <div class="home-feature-number">
+                            04
+                        </div>
+
+                        <h3>
+                            Organiser
+                        </h3>
+
+                        <p>
+                            Classez vos films, créez vos collections
+                            et construisez progressivement votre propre
+                            cinémathèque.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+    <section class="container">
+
+        <div class="home-cta">
+
+            <div class="row align-items-center g-4">
+
+                <div class="col-12 col-md-8">
+
+                    <span class="home-kicker">
+                        Première étape
+                    </span>
+
+                    <h2>
+                        Commencez votre bibliothèque.
+                    </h2>
+
+                    <p>
+                        Recherchez votre premier film et ajoutez-le
+                        à votre collection.
+                    </p>
+
+                </div>
+
+                <div class="col-12 col-md-4 text-md-end">
+
+                    <a asp-page="/Movies/Index"
+                       class="btn btn-primary">
+                        Rechercher un film
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>

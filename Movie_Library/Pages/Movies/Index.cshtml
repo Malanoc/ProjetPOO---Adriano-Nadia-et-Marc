@@ -1,0 +1,356 @@
+﻿@page
+@model Movie_Library.Pages.Movies.IndexModel
+
+@{
+    ViewData["Title"] = "Films";
+}
+
+<div class="container py-5 movies-page">
+
+    <!-- EN-TÊTE -->
+    <header class="mb-5">
+        <span class="home-kicker">Cinéma</span>
+
+        <h1 class="display-5 fw-bold">
+            Rechercher un film
+        </h1>
+
+        <p>
+            Trouvez un film sur TMDB et ajoutez-le à votre bibliothèque.
+        </p>
+    </header>
+
+
+    <!-- FORMULAIRE DE RECHERCHE -->
+    <form method="get" class="mb-5">
+        <div class="row g-2">
+
+            <div class="col">
+                <input type="text"
+                       name="SearchTerm"
+                       value="@Model.SearchTerm"
+                       class="form-control"
+                       placeholder="Ex. Inception, The Batman..."
+                       autocomplete="off" />
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">
+                    Rechercher
+                </button>
+            </div>
+
+        </div>
+    </form>
+
+
+    <!-- MESSAGE APRÈS AJOUT -->
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <div class="alert alert-secondary mb-4" role="status">
+            @Model.Message
+        </div>
+    }
+
+
+    <!-- RÉSULTATS -->
+    @if (!string.IsNullOrWhiteSpace(Model.SearchTerm))
+    {
+        <div class="mb-4">
+            <h2 class="h4">
+                Résultats pour « @Model.SearchTerm »
+            </h2>
+        </div>
+
+        @if (Model.FoundMovies.Count == 0 &&
+             Model.AlreadyInLibrary.Count == 0)
+        {
+            <div class="library-empty">
+                <h2 class="h4">Aucun film trouvé</h2>
+
+                <p>
+                    Aucun résultat ne correspond à votre recherche.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div id="movies-results-grid"
+                 class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4 movie-grid">
+
+                <!-- FILMS QUI PEUVENT ÊTRE AJOUTÉS -->
+                @foreach (var movie in Model.FoundMovies)
+                {
+                    <div class="col movie-search-item"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Afficher les détails de @movie.Title"
+                         data-movie-id="@movie.Id"
+                         data-title="@movie.Title"
+                         data-synopsis="@movie.Synopsis"
+                         data-poster="@movie.Poster"
+                         data-rating="@movie.RatingTMDB.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                         data-search-term="@Model.SearchTerm"
+                         data-in-library="false">
+
+                        <article class="movie-card movie-search-card">
+
+                            <!-- AFFICHE -->
+                            <div class="movie-poster">
+                                @if (!string.IsNullOrWhiteSpace(movie.Poster))
+                                {
+                                    <img src="@movie.Poster"
+                                         alt="@movie.Title"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="movie-poster-placeholder">
+                                        Pas d'affiche
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- INFORMATIONS ESSENTIELLES -->
+                            <div class="movie-info">
+                                <h3 class="movie-title">
+                                    @movie.Title
+                                </h3>
+
+                                <div class="movie-meta">
+                                    <span>TMDB</span>
+
+                                    @if (movie.RatingTMDB > 0)
+                                    {
+                                        <span class="movie-rating">
+                                            @movie.RatingTMDB.ToString("0.0") / 10
+                                        </span>
+                                    }
+                                </div>
+
+                                <p class="movie-search-hint">
+                                    Voir les détails
+                                </p>
+                            </div>
+
+                        </article>
+                    </div>
+                }
+
+
+                <!-- FILMS DÉJÀ DANS LA BIBLIOTHÈQUE -->
+                @foreach (var movie in Model.AlreadyInLibrary)
+                {
+                    <div class="col movie-search-item"
+                         role="button"
+                         tabindex="0"
+                         aria-label="Afficher les détails de @movie.Title"
+                         data-movie-id="@movie.Id"
+                         data-title="@movie.Title"
+                         data-synopsis="@movie.Synopsis"
+                         data-poster="@movie.Poster"
+                         data-rating="@movie.RatingTMDB.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                         data-search-term="@Model.SearchTerm"
+                         data-in-library="true">
+
+                        <article class="movie-card movie-search-card">
+
+                            <!-- AFFICHE -->
+                            <div class="movie-poster">
+                                @if (!string.IsNullOrWhiteSpace(movie.Poster))
+                                {
+                                    <img src="@movie.Poster"
+                                         alt="@movie.Title"
+                                         loading="lazy" />
+                                }
+                                else
+                                {
+                                    <div class="movie-poster-placeholder">
+                                        Pas d'affiche
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- INFORMATIONS ESSENTIELLES -->
+                            <div class="movie-info">
+                                <h3 class="movie-title">
+                                    @movie.Title
+                                </h3>
+
+                                <div class="movie-meta">
+                                    <span>TMDB</span>
+
+                                    @if (movie.RatingTMDB > 0)
+                                    {
+                                        <span class="movie-rating">
+                                            @movie.RatingTMDB.ToString("0.0") / 10
+                                        </span>
+                                    }
+                                </div>
+
+                                <p class="movie-search-status">
+                                    Déjà dans la bibliothèque
+                                </p>
+                            </div>
+
+                        </article>
+                    </div>
+                }
+
+            </div>
+        }
+    }
+
+</div>
+
+
+<!-- =====================================================
+     MODALE DES RÉSULTATS DE RECHERCHE
+     ===================================================== -->
+
+<div class="modal fade"
+     id="search-movie-modal"
+     tabindex="-1"
+     aria-labelledby="search-movie-modal-title"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+
+        <div class="modal-content movie-modal-content">
+
+            <!-- EN-TÊTE -->
+            <div class="modal-header">
+                <div>
+                    <span class="home-kicker">
+                        Détails du film
+                    </span>
+
+                    <h2 class="modal-title h3"
+                        id="search-movie-modal-title">
+                    </h2>
+                </div>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Fermer">
+                </button>
+            </div>
+
+
+            <!-- CONTENU -->
+            <div class="modal-body">
+
+                <div class="row g-4">
+
+                    <!-- AFFICHE -->
+                    <div class="col-12 col-sm-4">
+                        <div class="movie-poster">
+
+                            <img id="search-movie-modal-poster"
+                                 src=""
+                                 alt=""
+                                 loading="lazy" />
+
+                            <div id="search-movie-modal-no-poster"
+                                 class="movie-poster-placeholder d-none">
+                                Pas d'affiche
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <!-- INFORMATIONS -->
+                    <div class="col-12 col-sm-8">
+
+                        <div class="movie-modal-rating mb-3">
+                            <span class="movie-rating">
+                                Note TMDB
+                            </span>
+
+                            <strong id="search-movie-modal-rating"></strong>
+                        </div>
+
+                        <h3 class="h5">
+                            Synopsis
+                        </h3>
+
+                        <p id="search-movie-modal-synopsis"
+                           class="search-movie-modal-synopsis">
+                        </p>
+
+                        <!-- État si le film existe déjà -->
+                        <div id="search-movie-already-added"
+                             class="alert alert-secondary d-none"
+                             role="status">
+                            Ce film est déjà dans votre bibliothèque.
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+            <div class="modal-footer justify-content-between">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Fermer
+                </button>
+
+                <!--
+                    Le formulaire utilise le handler Add existant.
+                    Les champs cachés sont remplis par movies.js.
+                -->
+                <form method="post"
+                      asp-page-handler="Add"
+                      id="search-add-movie-form"
+                      class="m-0">
+
+                    <input type="hidden"
+                           id="search-add-movie-id"
+                           name="id" />
+
+                    <input type="hidden"
+                           id="search-add-movie-title"
+                           name="title" />
+
+                    <input type="hidden"
+                           id="search-add-movie-synopsis"
+                           name="synopsis" />
+
+                    <input type="hidden"
+                           id="search-add-movie-poster"
+                           name="poster" />
+
+                    <input type="hidden"
+                           id="search-add-movie-rating"
+                           name="ratingTMDB" />
+
+                    <input type="hidden"
+                           id="search-add-movie-search-term"
+                           name="searchTerm"
+                           value="@Model.SearchTerm" />
+
+                    <button type="submit"
+                            id="search-add-movie-button"
+                            class="btn btn-primary">
+                        Ajouter à ma bibliothèque
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/movies.js" asp-append-version="true"></script>
+}

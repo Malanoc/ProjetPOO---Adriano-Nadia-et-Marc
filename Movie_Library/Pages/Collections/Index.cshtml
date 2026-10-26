@@ -1,0 +1,245 @@
+﻿@page
+@model Movie_Library.Pages.Collections.IndexModel
+
+@{
+    ViewData["Title"] = "Collections";
+}
+
+
+<div class="container py-5">
+
+    <!-- =====================================================
+         EN-TÊTE
+         ===================================================== -->
+
+    <header class="mb-5">
+
+        <span class="home-kicker">
+            Bibliothèque
+        </span>
+
+        <h1 class="display-5 fw-bold">
+            Mes collections
+        </h1>
+
+        <p>
+            Créez des collections pour organiser vos films.
+        </p>
+
+    </header>
+
+
+    <!-- =====================================================
+         MESSAGE DE CONFIRMATION
+         ===================================================== -->
+
+    @if (!string.IsNullOrWhiteSpace(Model.Message))
+    {
+        <div class="alert alert-success mb-4"
+             role="status">
+
+            @Model.Message
+
+        </div>
+    }
+
+
+    <!-- =====================================================
+         FORMULAIRE DE CRÉATION
+         ===================================================== -->
+
+    <section class="mb-5">
+
+        <h2 class="h4 mb-3">
+            Créer une collection
+        </h2>
+
+
+        <form method="post"
+              asp-page-handler="Create">
+
+            <div class="row g-2">
+
+                <!-- NOM DE LA COLLECTION -->
+                <div class="col">
+
+                    <label asp-for="CollectionName"
+                           class="form-label">
+                        Nom de la collection
+                    </label>
+
+                    <input asp-for="CollectionName"
+                           class="form-control"
+                           placeholder="Ex. Science-fiction, Marvel, Films préférés..."
+                           autocomplete="off" />
+
+                    <!--
+                        Affiche automatiquement le message
+                        défini par [Required] lorsque le champ
+                        n'est pas correctement rempli.
+                    -->
+                    <span asp-validation-for="CollectionName"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+
+                <!-- BOUTON -->
+                <div class="col-auto align-self-end">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        Créer
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <!-- =====================================================
+         COLLECTIONS EXISTANTES
+         ===================================================== -->
+
+    <section>
+
+        <h2 class="h4 mb-4">
+            Collections créées
+        </h2>
+
+
+        @if (Model.Library.Collections.Count == 0)
+        {
+            <div class="library-empty">
+
+                <h3 class="h5">
+                    Aucune collection
+                </h3>
+
+                <p>
+                    Créez votre première collection à l'aide
+                    du formulaire ci-dessus.
+                </p>
+
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-4 movie-grid">
+
+                @foreach (var collection in Model.Library.Collections)
+                {
+                    <!--
+                        movie-item permet de récupérer l'animation
+                        de déplacement vers le haut.
+                    -->
+                    <div class="col movie-item">
+            
+                        <a asp-page="/Collections/Details"
+                           asp-route-name="@collection.Name"
+                           class="text-decoration-none text-reset d-block h-100">
+            
+            
+                            <!--
+                                movie-card permet notamment d'obtenir
+                                l'effet de zoom sur le poster.
+                            -->
+                            <article class="movie-card">
+            
+            
+                                <!-- POSTER -->
+                                <div class="movie-poster">
+            
+                                    @if (!string.IsNullOrWhiteSpace(
+                                        collection.Poster))
+                                    {
+                                        <img src="@collection.Poster"
+                                             alt="Poster de @collection.Name"
+                                             loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="movie-poster-placeholder">
+            
+                                            Pas de poster
+            
+                                        </div>
+                                    }
+            
+                                </div>
+            
+            
+                                <!-- INFORMATIONS -->
+                                <div class="movie-info">
+            
+                                    <h3 class="movie-title">
+                                        @collection.Name
+                                    </h3>
+            
+                                    <div class="movie-meta">
+            
+                                        <span class="movie-status-label">
+            
+                                            @collection.Movies.Count film(s)
+            
+                                        </span>
+            
+                                    </div>
+            
+                                </div>
+            
+                            </article>
+            
+                        </a>
+
+                        <!-- =================================================
+                             SUPPRESSION DE LA COLLECTION
+                             ================================================= -->
+                        
+                        <form method="post"
+                              asp-page-handler="Delete"
+                              class="mt-2"
+                              onsubmit="return confirm(
+                                  'Voulez-vous vraiment supprimer la collection « @collection.Name » ?'
+                              );">
+                        
+                            <!--
+                                Envoie le nom de la collection
+                                au handler OnPostDelete.
+                            -->
+                            <input type="hidden"
+                                   name="collectionName"
+                                   value="@collection.Name" />
+                        
+                        
+                            <button type="submit"
+                                    class="btn btn-outline-danger btn-sm w-100">
+                        
+                                Supprimer la collection
+                        
+                            </button>
+                        
+                        </form>
+            
+                    </div>
+                }
+            
+            </div>
+        }
+
+    </section>
+
+</div>
+
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}
