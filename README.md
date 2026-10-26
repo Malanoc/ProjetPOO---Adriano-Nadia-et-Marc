@@ -151,6 +151,13 @@ Contient la logique de l'application ainsi que la communication avec les service
 
 - `MoviesApi.cs` — gère les appels à l'API TMDB.
 
+### Repositories/
+
+Contient les classes qui centralisent l'accès aux données et font le lien entre la logique de l'application et le service de base de données.
+
+- `MovieRepository.cs` — gère les opérations sur les films : récupération, ajout, modification et suppression.
+- `CollectionRepository.cs` — gère les opérations sur les collections : sauvegarde, récupération et suppression, ainsi que les associations entre les films et les collections.
+
 ### Data/
 
 Contient les éléments nécessaires à la configuration et à l'accès à MongoDB.
